@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حساب کتاب اور بلنگ کیلکولیٹر</title>
+    <title>حساب کتاب اور بلنگ کیلکولیٹر - نیو قاری ہوزری سٹور</title>
     <!-- Tailwind CSS برائے ڈیزائننگ -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons برائے شبیہیں -->
@@ -12,8 +12,9 @@
     <!-- html2canvas لائبریری برائے تصویر ڈاؤن لوڈ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- ☁️ فائر بیس کلاؤڈ کی مرکزی لائبریریز -->
+    <!-- ☁️ فائر بیس کلاؤڈ کی مستحکم لائبریریز -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <style>
@@ -73,7 +74,7 @@
                 top: 0 !important;
                 width: 100% !important;
                 margin: 0 !important;
-                padding: 10px !important;
+                padding: 20px !important;
                 background: #ffffff !important;
                 color: #000000 !important;
             }
@@ -119,9 +120,34 @@
 
     <!-- کلاؤڈ سیکیورٹی بار -->
     <div class="max-w-7xl mx-auto w-full px-4 mt-3 no-print">
-        <div id="cloud-status" class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600 animate-pulse"></i>
-            <span>کلاؤڈ سیکیورٹی لاک فعال ہے۔ آپ کا کلاؤڈ ڈیٹا بیس محفوظ اور چالو ہے۔</span>
+        <div id="cloud-status" class="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-sans justify-center">
+            <i data-lucide="loader" class="w-3.5 h-3.5 text-amber-600 animate-spin"></i>
+            <span>کلاؤڈ سیکیورٹی لاک کی تصدیق کی جا رہی ہے...</span>
+        </div>
+    </div>
+
+    <!-- کاروبار کے مجموعی سیشن کے اعداد و شمار (ڈیش بورڈ) -->
+    <div class="max-w-7xl mx-auto w-full px-4 mt-3 grid grid-cols-3 gap-3 no-print">
+        <div class="bg-white rounded-xl shadow-xs border border-indigo-100 p-2.5 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] text-slate-400 font-bold">کل محفوظ بل</p>
+                <h4 id="stat-total-bills" class="text-sm md:text-base font-extrabold text-indigo-700 font-mono">0</h4>
+            </div>
+            <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="folder-open" class="w-4 h-4"></i></span>
+        </div>
+        <div class="bg-white rounded-xl shadow-xs border border-emerald-100 p-2.5 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] text-slate-400 font-bold">کل سیلز بزنس</p>
+                <h4 class="text-sm md:text-base font-extrabold text-emerald-700 font-mono"><span id="stat-total-sales">0.00</span></h4>
+            </div>
+            <span class="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="banknote" class="w-4 h-4"></i></span>
+        </div>
+        <div class="bg-white rounded-xl shadow-xs border border-rose-100 p-2.5 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] text-slate-400 font-bold">کل بقایا کھاتہ</p>
+                <h4 class="text-sm md:text-base font-extrabold text-rose-700 font-mono"><span id="stat-total-due">0.00</span></h4>
+            </div>
+            <span class="p-1.5 bg-rose-50 text-rose-600 rounded-lg"><i data-lucide="alert-circle" class="w-4 h-4"></i></span>
         </div>
     </div>
 
@@ -180,6 +206,7 @@
                 <div class="bg-slate-900 text-white p-3 rounded-xl mb-3 text-left font-mono relative shadow-inner border border-slate-800">
                     <div id="calc-history" class="text-slate-500 text-2xs min-h-[1.2rem] break-all"></div>
                     <div id="calc-screen" class="text-2xl font-bold tracking-wider truncate mt-0.5 text-emerald-400">0</div>
+                    <span class="absolute top-1 right-2 text-[9px] text-slate-500 font-sans hidden sm:block">کی بورڈ سپورٹ آن ہے</span>
                 </div>
 
                 <!-- کیلکولیٹر کی بورڈ -->
@@ -252,13 +279,22 @@
             <!-- ڈیجیٹل رسید کارڈ -->
             <div id="receipt-card" class="bg-white rounded-2xl shadow-lg border-t-4 border-pink-500 p-4 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
                 
-                <!-- کسٹمر نام داخل کرنے کا سیکشن -->
-                <div class="bg-gradient-to-r from-pink-50 to-indigo-50/50 p-2.5 rounded-xl border border-pink-100/60 mb-2 no-print flex flex-col sm:flex-row items-center gap-2">
-                    <label class="text-xs font-bold text-pink-700 flex items-center gap-1 shrink-0">
-                        <i data-lucide="user" class="w-3.5 h-3.5"></i>
-                        خریدار / کسٹمر کا نام لکھیں:
-                    </label>
-                    <input type="text" id="customer-name-input" oninput="updateCustomerName(this.value)" placeholder="کسٹمر کا نام درج کریں..." class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 font-medium font-bold">
+                <!-- خریدار کی معلومات کا الگ اور واضع پینل (مفتوحہ فارمیٹ) -->
+                <div class="bg-gradient-to-r from-pink-50 via-slate-50 to-indigo-50/50 p-3 rounded-xl border border-pink-100/60 mb-3 no-print grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-pink-700 mb-1 flex items-center gap-1">
+                            <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                            خریدار / کسٹمر کا نام لکھیں:
+                        </label>
+                        <input type="text" id="customer-name-input" oninput="updateCustomerName(this.value)" placeholder="کسٹمر کا نام درج کریں..." class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 font-bold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-purple-700 mb-1 flex items-center gap-1">
+                            <i data-lucide="history" class="w-3.5 h-3.5 text-purple-600"></i>
+                            سابقہ بقایا رقم (سابقہ کھاتہ):
+                        </label>
+                        <input type="number" id="previous-balance" min="0" value="0" oninput="calculateTotals()" placeholder="0.00" class="w-full bg-white border border-purple-200 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-slate-800">
+                    </div>
                 </div>
 
                 <!-- اسکرین پر نظر آنے والی فائنل رسید -->
@@ -301,28 +337,28 @@
                         </div>
                     </div>
 
-                    <!-- مجموعی رقم کا حساب کتاب (تبدیل شدہ حصہ) -->
+                    <!-- مجموعی رقم کا حساب کتاب -->
                     <div class="border-t border-dashed border-slate-300 pt-3 space-y-1.5 text-xs">
                         <div class="flex justify-between text-slate-600">
-                            <span class="font-bold">موجوہ بل رقم (Subtotal):</span>
+                            <span class="font-bold">موجودہ بل رقم (Subtotal):</span>
                             <span class="font-mono font-bold text-slate-700">روپے <span id="subtotal-val">0.00</span></span>
                         </div>
                         
-                        <!-- وصول رقم اور سابقہ بقایا کی فیلڈز (روپے میں) -->
-                        <div class="grid grid-cols-2 items-center gap-4 py-1.5 bg-slate-100/50 p-2 rounded-xl border border-slate-200/40">
+                        <!-- نئی وصول رقم کا واضع ان پٹ پینل -->
+                        <div class="py-1.5 bg-rose-50/50 p-2.5 rounded-xl border border-rose-200/40 flex items-center justify-between no-print">
+                            <span class="text-xs font-bold text-slate-600 flex items-center gap-1">
+                                <i data-lucide="wallet" class="w-3.5 h-3.5 text-rose-500"></i>
+                                خریدار سے حاصل کردہ نقد وصول رقم:
+                            </span>
                             <div class="flex items-center gap-1.5">
-                                <label class="text-sm font-bold text-purple-700 shrink-0">سابقہ بقایا (+)</label>
-                                <input type="number" id="previous-balance" min="0" value="0" oninput="calculateTotals()" class="w-20 px-1.5 py-0.5 border border-purple-200 rounded text-center font-mono font-bold focus:ring-1 focus:ring-purple-500 focus:outline-none">
-                            </div>
-                            <div class="flex items-center gap-1.5 justify-end">
                                 <label class="text-sm font-bold text-rose-700 shrink-0">وصول رقم (-)</label>
-                                <input type="number" id="received-amount" min="0" value="0" oninput="calculateTotals()" class="w-20 px-1.5 py-0.5 border border-rose-200 rounded text-center font-mono font-bold focus:ring-1 focus:ring-rose-500 focus:outline-none">
+                                <input type="number" id="received-amount" min="0" value="0" oninput="calculateTotals()" class="w-24 px-2 py-1 border border-rose-200 rounded-lg text-center font-mono font-bold focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 focus:outline-none text-xs text-slate-800">
                             </div>
                         </div>
 
                         <!-- لائیو رسید پر بریک ڈاؤن شو ہونا -->
                         <div id="print-previous-balance-row" class="flex justify-between text-slate-600">
-                            <span class="font-bold">سابقہ بقایا:</span>
+                            <span class="font-bold">سابقہ بقایا رقم:</span>
                             <span class="font-mono text-purple-700 font-bold">+ روپے <span id="print-previous-balance-val">0.00</span></span>
                         </div>
                         <div id="print-received-amount-row" class="flex justify-between text-slate-600">
@@ -338,35 +374,48 @@
                 </div>
 
                 <!-- رسید ایکشن بٹنز -->
-                <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-5 gap-2">
                     <button onclick="saveCurrentBill()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
                         <i data-lucide="cloud-lightning" class="w-3.5 h-3.5"></i>
-                        کلاؤڈ پر سیو کریں
+                        کلاؤڈ محفوظ
+                    </button>
+                    <button onclick="shareOnWhatsApp()" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                        <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                        واٹس ایپ شیئر
                     </button>
                     <button onclick="downloadBillAsImage()" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
                         <i data-lucide="image" class="w-3.5 h-3.5"></i>
-                        تصویر ڈاؤن لوڈ 🖼️
+                        ڈاؤنلوڈ 🖼️
                     </button>
                     <button onclick="printBill()" class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
                         <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                        پرنٹ / PDF لیں
+                        پرنٹ / PDF
                     </button>
-                    <button onclick="resetBill()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition">
+                    <button onclick="resetBill()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition col-span-2 sm:col-span-1">
                         <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                        نیا بل بنائیں
+                        نیا بل
                     </button>
                 </div>
             </div>
 
             <!-- محفوظ شدہ بلوں کا مستقل کلاؤڈ ریکارڈ ہسٹری -->
             <div class="bg-white rounded-2xl shadow-md border-t-4 border-slate-400 p-4">
-                <h3 class="font-bold text-base text-slate-700 flex items-center gap-1.5 mb-3 pb-1.5 border-b border-slate-100">
-                    <i data-lucide="cloud-lightning" class="w-4 h-4 text-indigo-600"></i>
-                    محفوظ شدہ بلوں کا لائیو کلاؤڈ ریکارڈ (تمام آلات کے لیے)
-                </h3>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3 pb-1.5 border-b border-slate-100">
+                    <h3 class="font-bold text-base text-slate-700 flex items-center gap-1.5">
+                        <i data-lucide="cloud-lightning" class="w-4 h-4 text-indigo-600"></i>
+                        محفوظ شدہ بلوں کا لائیو کلاؤڈ کھاتہ
+                    </h3>
+                </div>
+
+                <!-- سرچ بار برائے کلاؤڈ بلز -->
+                <div class="mb-3 relative">
+                    <input type="text" id="search-bills" oninput="filterSavedBills(this.value)" placeholder="بل نمبر یا خریدار کے نام سے تلاش کریں..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-8 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-bold text-slate-800">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5"></i>
+                </div>
+
                 <div id="saved-bills-list" class="space-y-2 max-h-[180px] overflow-y-auto pr-0.5 text-xs">
                     <div class="text-center py-4 text-slate-400">
-                        کوئی بل لوڈ نہیں ہو رہا...
+                        لوڈ ہو رہا ہے...
                     </div>
                 </div>
             </div>
@@ -404,7 +453,7 @@
 
         <div style="border-top: 2px dashed #000000; margin-top: 15px; padding-top: 10px; font-size: 14px; line-height: 1.8; font-weight: bold;">
             <div style="display: flex; justify-content: space-between;">
-                <span>موجوہ بل رقم (Subtotal):</span>
+                <span>موجودہ بل رقم (Subtotal):</span>
                 <span>روپے <span id="print-subtotal-val">0.00</span></span>
             </div>
             <div id="real-print-previous-balance-row" style="display: flex; justify-content: space-between;">
@@ -433,7 +482,7 @@
 
     <!-- فوٹر -->
     <footer class="mt-auto py-4 text-center text-2xs text-slate-400 border-t border-slate-200/60 no-print">
-        <p>ڈجیٹل بلنگ اور سمارٹ کیلکولیٹر ٹول © ۲۰۲۶۔ تمام حقوق محفوظ ہیں۔</p>
+        <p>ڈیجیٹل بلنگ اور سمارٹ کیلکولیٹر ٹول © ۲۰۲۶۔ تمام حقوق محفوظ ہیں۔</p>
     </footer>
 
     <!-- جاوا اسکرپٹ کوڈ لاجک -->
@@ -445,30 +494,58 @@
         // 🔐 دکان کا خفیہ پن کوڈ سیکیورٹی کے لیے
         const SHOP_SECURITY_PIN = "1234";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBOl7bex-m83Q2iRegJG5Lz4Dc7XeRlmp0",
-            authDomain: "billing-730a8.firebaseapp.com",
-            projectId: "billing-730a8",
-            storageBucket: "billing-730a8.firebasestorage.app",
-            messagingSenderId: "386280634762",
-            appId: "1:386280634762:web:2bf0008dde0c35c81f073*"
-        };
+        // 🔗 فائر بیس اور کلاؤڈ سیکیورٹی کنفیگریشن
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'billing-730a8';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyBOl7bex-m83Q2iRegJG5Lz4Dc7XeRlmp0",
+                authDomain: "billing-730a8.firebaseapp.com",
+                projectId: "billing-730a8",
+                storageBucket: "billing-730a8.firebasestorage.app",
+                messagingSenderId: "386280634762",
+                appId: "1:386280634762:web:2bf0008dde0c35c81f073*"
+            };
 
         let db = null;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            document.getElementById('cloud-status').className = "bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center";
-            document.getElementById('cloud-status').innerHTML = '<i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> <span>کلاؤڈ سیکیورٹی لاک فعال ہے۔ اب آپ کا کھاتہ مکمل طور پر محفوظ ہے۔</span>';
-        } catch(e) {
-            document.getElementById('cloud-status').className = "bg-rose-50 border border-rose-200 text-rose-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center";
-            document.getElementById('cloud-status').innerHTML = '<i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i> <span>فائر بیس لوڈ کرنے میں مسئلہ آیا!</span>';
+        let auth = null;
+        let billsCollection = null;
+
+        // کلاؤڈ نیٹ ورک کے محفوظ بائنڈز (Firebase Rules Guardrails)
+        async function initFirebaseAndAuth() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                
+                // کلاؤڈ پاتھ کا محفوظ تعین
+                billsCollection = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('bills');
+
+                // کلاؤڈ سیکیورٹی لاک
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await auth.signInWithCustomToken(__initial_auth_token);
+                } else {
+                    await auth.signInAnonymously();
+                }
+
+                document.getElementById('cloud-status').className = "bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center";
+                document.getElementById('cloud-status').innerHTML = '<i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> <span>کلاؤڈ سیکیورٹی لاک فعال ہے۔ اب آپ کا کھاتہ مکمل طور پر محفوظ ہے۔</span>';
+                
+                lucide.createIcons();
+                loadSavedBillsFromCloud();
+            } catch(e) {
+                console.error("Firebase Auth Error:", e);
+                document.getElementById('cloud-status').className = "bg-rose-50 border border-rose-200 text-rose-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center";
+                document.getElementById('cloud-status').innerHTML = '<i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i> <span>فائر بیس لوڈ کرنے میں مسئلہ آیا! لوکل سیشن فعال ہے۔</span>';
+                lucide.createIcons();
+            }
         }
 
         let ledgerItems = [];
         let currentBill = { 
             id: generateBillId(), 
             date: new Date().toLocaleString('ur-PK'), 
+            dateRaw: new Date().toISOString(),
             items: [], 
             previousBalance: 0, 
             receivedAmount: 0, 
@@ -486,8 +563,33 @@
         window.onload = function() {
             lucide.createIcons();
             updateBillUIDisplay();
-            loadSavedBillsFromLocalStorage();
+            initFirebaseAndAuth();
+            setupKeyboardShortcuts();
         };
+
+        // کی بورڈ ان پٹ سپورٹ
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+                    return; 
+                }
+                const key = e.key;
+                if (key >= '0' && key <= '9') {
+                    pressNum(key);
+                } else if (key === '.') {
+                    pressNum('.');
+                } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                    pressOperator(key);
+                } else if (key === 'Enter') {
+                    e.preventDefault();
+                    addCurrentToLedger();
+                } else if (key === 'Backspace') {
+                    deleteLast();
+                } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                    clearCalc();
+                }
+            });
+        }
 
         function updateCustomerName(name) {
             currentBill.customerName = name.trim();
@@ -654,13 +756,13 @@
                 row.innerHTML = `
                     <div class="flex items-center gap-2">
                         <span class="text-2xs font-bold text-slate-400 w-4 text-center">${index + 1}</span>
-                        <input type="text" value="${item.name}" onchange="updateLedgerItemName(${item.id}, this.value)" class="flex-grow bg-white border border-slate-200 rounded px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 font-bold">
+                        <input type="text" value="${item.name}" onchange="updateLedgerItemName(${item.id}, this.value)" class="flex-grow bg-white border border-slate-200 rounded px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 font-bold text-slate-800">
                         <button onclick="removeLedgerItem(${item.id})" class="text-rose-500 hover:text-rose-700 p-1 hover:bg-rose-50 rounded-lg transition"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
                     </div>
                     <div class="flex justify-between items-center pr-6 text-2xs text-slate-500">
                         <div class="flex gap-1.5">
-                            <span>تعداد: <input type="number" min="1" value="${item.qty}" onchange="updateLedgerItemQty(${item.id}, this.value)" class="w-9 px-0.5 border border-slate-200 rounded text-center font-mono font-bold"></span>
-                            <span>قیمت: <input type="number" value="${item.price}" onchange="updateLedgerItemPrice(${item.id}, this.value)" class="w-16 px-0.5 border border-slate-200 rounded text-center font-mono font-bold"></span>
+                            <span>تعداد: <input type="number" min="1" value="${item.qty}" onchange="updateLedgerItemQty(${item.id}, this.value)" class="w-9 px-0.5 border border-slate-200 rounded text-center font-mono font-bold text-slate-800"></span>
+                            <span>قیمت: <input type="number" value="${item.price}" onchange="updateLedgerItemPrice(${item.id}, this.value)" class="w-16 px-0.5 border border-slate-200 rounded text-center font-mono font-bold text-slate-800"></span>
                         </div>
                         <span class="font-mono font-bold text-purple-700 text-xs bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100/60">${item.qty} × ${item.price} = ${item.total} روپے</span>
                     </div>
@@ -682,6 +784,7 @@
             currentBill.items = JSON.parse(JSON.stringify(ledgerItems));
             if (!currentBill.id || currentBill.id === "--") { currentBill.id = generateBillId(); }
             currentBill.date = new Date().toLocaleString('ur-PK');
+            currentBill.dateRaw = new Date().toISOString();
             calculateTotals();
             showNotification("مبارک ہو! حساب کتاب کی فائنل رسید تیار ہو گئی ہے۔");
             document.getElementById('receipt-card').scrollIntoView({ behavior: 'smooth' });
@@ -707,10 +810,8 @@
             document.getElementById('subtotal-val').innerText = subtotal.toFixed(2);
             document.getElementById('grandtotal-val').innerText = grandTotal.toFixed(2);
             
-            // ڈسپلے بریک ڈاؤن لائیو اپڈیٹ کریں
-            document.getElementById('print-previous-balance-pct').innerText = previousBalance.toFixed(0);
+            // لائیو رسید پر بریک ڈاؤن شو ہونا
             document.getElementById('print-previous-balance-val').innerText = previousBalance.toFixed(2);
-            document.getElementById('print-received-amount-pct').innerText = receivedAmount.toFixed(0);
             document.getElementById('print-received-amount-val').innerText = receivedAmount.toFixed(2);
             
             document.getElementById('print-previous-balance-row').style.display = previousBalance > 0 ? 'flex' : 'none';
@@ -774,8 +875,39 @@
             }).catch(err => { showNotification("تصویر بنانے میں کوئی مسئلہ پیش آیا ہے!", "error"); });
         }
 
+        function shareOnWhatsApp() {
+            if (currentBill.items.length === 0) { showNotification("واٹس ایپ پر بھیجنے کے لیے پہلے فائنل بل بنانا لازمی ہے!", "error"); return; }
+            
+            let text = `*نیو قاری ہوزری سٹور - ڈیجیٹل بل*\n`;
+            text += `---------------------------------\n`;
+            text += `*بل نمبر:* ${currentBill.id}\n`;
+            text += `*تاریخ:* ${currentBill.date}\n`;
+            if (currentBill.customerName) {
+                text += `*خریدار:* ${currentBill.customerName}\n`;
+            }
+            text += `---------------------------------\n`;
+            currentBill.items.forEach((item, idx) => {
+                text += `${idx + 1}. *${item.name}* (${item.qty} × ${item.price} = ${item.total} روپے)\n`;
+            });
+            text += `---------------------------------\n`;
+            text += `*مجموعہ (Subtotal):* ${currentBill.subtotal.toFixed(2)} روپے\n`;
+            if (currentBill.previousBalance > 0) {
+                text += `*سابقہ بقایا:* +${currentBill.previousBalance.toFixed(2)} روپے\n`;
+            }
+            if (currentBill.receivedAmount > 0) {
+                text += `*وصول رقم:* -${currentBill.receivedAmount.toFixed(2)} روپے\n`;
+            }
+            text += `*کل واجب الادا رقم:* *${currentBill.grandTotal.toFixed(2)} روپے*\n`;
+            text += `---------------------------------\n`;
+            text += `شکریہ! آپ کے تعاون کا بہت بہت شکریہ۔`;
+
+            const encodedText = encodeURIComponent(text);
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedText}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
         function resetBill() {
-            currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], previousBalance: 0, receivedAmount: 0, subtotal: 0, grandTotal: 0, customerName: "" };
+            currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), dateRaw: new Date().toISOString(), items: [], previousBalance: 0, receivedAmount: 0, subtotal: 0, grandTotal: 0, customerName: "" };
             ledgerItems = []; 
             document.getElementById('previous-balance').value = 0; 
             document.getElementById('received-amount').value = 0;
@@ -791,10 +923,10 @@
             window.print();
         }
 
-        // کلاؤڈ رائٹ فنکشن (پن کوڈ پروٹیکٹڈ)
+        // کلاؤڈ رائٹ فنکشن (سیکیورٹی لاکڈ)
         function saveCurrentBill() {
             if (currentBill.items.length === 0) { showNotification("خالی بل کو کلاؤڈ پر محفوظ نہیں کیا جا سکتا!", "error"); return; }
-            if (!db) { showNotification("کلاؤڈ ڈیٹا بیس دستیاب نہیں ہے!", "error"); return; }
+            if (!db || !auth || !auth.currentUser) { showNotification("کلاؤڈ ڈیٹا بیس فی الحال دستیاب نہیں ہے!", "error"); return; }
 
             const userPin = prompt("کلاؤڈ سیکیورٹی لاک فعال ہے۔ براہ کرم دکان کا خفیہ پن کوڈ (PIN Code) درج کریں:");
             if (userPin === null) return; 
@@ -807,44 +939,85 @@
             showNotification("ڈیٹا لائیو کلاؤڈ پر منتقل کیا جا رہا ہے...", "success");
             currentBill.items = ledgerItems;
 
-            db.collection("bills").doc(currentBill.id).set(currentBill)
+            billsCollection.doc(currentBill.id).set(currentBill)
             .then(() => {
                 showNotification("🎉 بل نیو قاری ہوزری کلاؤڈ ڈیٹا بیس میں مستقل محفوظ ہو گیا ہے!", "success");
-                loadSavedBillsFromLocalStorage(); 
+                loadSavedBillsFromCloud(); 
             })
             .catch((error) => {
+                console.error(error);
                 showNotification("کلاؤڈ پر ڈیٹا محفوظ کرنے میں ناکامی!", "error");
             });
         }
 
-        // کلاؤڈ سے بل لائیو حاصل کرنا
-        function loadSavedBillsFromLocalStorage() {
-            if (!db) return;
+        // کلاؤڈ سے لائیو بلز حاصل کرنا (ان-میموری سورٹنگ)
+        function loadSavedBillsFromCloud() {
+            if (!db || !auth || !auth.currentUser) return;
 
-            db.collection("bills").orderBy("date", "desc").get()
+            billsCollection.get()
             .then((querySnapshot) => {
                 savedBills = [];
                 querySnapshot.forEach((doc) => {
                     savedBills.push(doc.data());
                 });
+                
+                // تاریخ کی بنیاد پر ان-میموری فاسٹ سورٹنگ
+                savedBills.sort((a, b) => {
+                    const dateA = new Date(a.dateRaw || a.date);
+                    const dateB = new Date(b.dateRaw || b.date);
+                    return dateB - dateA;
+                });
+
                 renderSavedBillsList(); 
+                calculateDashboardStats();
             })
             .catch((error) => {
+                console.error(error);
                 const listContainer = document.getElementById('saved-bills-list');
                 listContainer.innerHTML = `<div class="text-center py-4 text-rose-500 font-bold">کلاؤڈ ڈیٹا لوڈ نہیں ہو سکا۔</div>`;
             });
         }
 
-        function renderSavedBillsList() {
+        // لائیو سیلز ڈیش بورڈ کے اعداد و شمار کا حساب
+        function calculateDashboardStats() {
+            const totalBillsCount = savedBills.length;
+            let totalSales = 0;
+            let totalOutstanding = 0;
+
+            savedBills.forEach(bill => {
+                totalSales += parseFloat(bill.subtotal || 0);
+                totalOutstanding += parseFloat(bill.grandTotal || 0);
+            });
+
+            document.getElementById('stat-total-bills').innerText = totalBillsCount;
+            document.getElementById('stat-total-sales').innerText = totalSales.toFixed(2);
+            document.getElementById('stat-total-due').innerText = totalOutstanding.toFixed(2);
+        }
+
+        function filterSavedBills(query) {
+            query = query.toLowerCase().trim();
+            if (query === "") {
+                renderSavedBillsList();
+                return;
+            }
+            const filtered = savedBills.filter(bill => {
+                const idMatch = bill.id.toLowerCase().includes(query);
+                const nameMatch = (bill.customerName || "").toLowerCase().includes(query);
+                return idMatch || nameMatch;
+            });
+            renderSavedBillsList(filtered);
+        }
+
+        function renderSavedBillsList(listToRender = savedBills) {
             const listContainer = document.getElementById('saved-bills-list');
             listContainer.innerHTML = "";
 
-            if (savedBills.length === 0) {
-                listContainer.innerHTML = `<div class="text-center py-4 text-slate-400">ابھی تک کلاؤڈ پر کوئی بل محفوظ نہیں کیا گیا۔</div>`;
+            if (listToRender.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-4 text-slate-400">کوئی مماثل بل نہیں ملا۔</div>`;
                 return;
             }
 
-            savedBills.forEach(bill => {
+            listToRender.forEach(bill => {
                 const customerString = bill.customerName ? ` | خریدار: ${bill.customerName}` : " | عام کسٹمر";
                 const card = document.createElement('div');
                 card.className = "p-2.5 bg-slate-50 border border-slate-200 rounded-xl hover:border-indigo-400 transition duration-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs shadow-2xs";
@@ -892,7 +1065,7 @@
         // کلاؤڈ سے مستقل بل حذف کرنا
         function deleteSavedBill(billId, event) {
             event.stopPropagation();
-            if (!db) return;
+            if (!db || !auth || !auth.currentUser) return;
 
             const userPin = prompt("حذف کرنے کے لیے دکان کا خفیہ پن کوڈ (PIN Code) درج کریں:");
             if (userPin === null) return;
@@ -903,12 +1076,13 @@
             }
 
             if (confirm("کیا آپ واقعی یہ بل کلاؤڈ ریکارڈ سے مستقل حذف کرنا چاہتے ہیں؟")) {
-                db.collection("bills").doc(billId).delete()
+                billsCollection.doc(billId).delete()
                 .then(() => {
                     showNotification("بل کلاؤڈ نیٹ ورک سے کامیابی سے حذف کر دیا گیا ہے۔", "success");
-                    loadSavedBillsFromLocalStorage(); 
+                    loadSavedBillsFromCloud(); 
                 })
                 .catch((error) => {
+                    console.error(error);
                     showNotification("حذف کرنے میں خرابی پیش آئی!", "error");
                 });
             }
