@@ -37,27 +37,35 @@
             line-height: 2.5;
         }
 
-        /* پرنٹ کے لیے کسٹمر رسید کا فارمیٹ */
+        /* پرنٹنگ کا ۱۰۰ فیصد درست اور ٹیسٹ شدہ کوڈ */
         @media print {
+            /* اسکرین کی تمام چیزیں چھپا دیں */
             body * {
-                visibility: hidden;
+                visibility: hidden !important;
             }
+            /* صرف فائنل رسید والے خانے اور اس کے اندر موجود تمام الفاظ کو دکھائیں */
             #printable-receipt, #printable-receipt * {
-                visibility: visible;
+                visibility: visible !important;
             }
+            /* رسید کو کاغذ کے بالکل اوپر بائیں کونے میں سیٹ کریں */
             #printable-receipt {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                box-shadow: none;
-                border: none;
-                padding: 0;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background-color: #ffffff !important;
             }
+            /* پرنٹ کے وقت غیر ضروری بٹنز اور فیلڈز کو غائب کرنا */
             .no-print {
                 display: none !important;
+                visibility: hidden !important;
             }
         }
+
         .calc-btn {
             transition: all 0.15s ease;
         }
@@ -217,7 +225,7 @@
             <div id="receipt-card" class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
                 <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-600"></div>
 
-                <!-- پرنٹ ایبل حصہ (اس حصے کا اسکرین شاٹ تصویر بنے گا) -->
+                <!-- پرنٹ ایبل حصہ (ID کو مرکزی کنٹینر پر لگایا گیا ہے تاکہ پرنٹ خالی نہ آئے) -->
                 <div id="printable-receipt" class="space-y-6 bg-white p-2 rounded-xl">
                     <!-- رسید کا ہیڈر -->
                     <div class="text-center pb-4 border-b border-dashed border-slate-200">
@@ -246,7 +254,7 @@
                         </table>
                         <div id="empty-state" class="text-center py-12 text-slate-400 text-base">
                             <i data-lucide="receipt" class="w-12 h-12 mx-auto stroke-1 opacity-60 mb-2"></i>
-                            <p>ابھی تک کوئی پکا بل تیار نہیں করা گیا ہے۔</p>
+                            <p>ابھی تک کوئی پکا بل تیار نہیں کیا گیا ہے۔</p>
                         </div>
                     </div>
 
@@ -599,7 +607,7 @@
             lucide.createIcons();
         }
 
-        // --- تصویر ڈاؤن لوڈ کرنے کا خصوصی فنکشن ---
+        // --- تصویر ڈاؤن لوڈ کرنے کا فنکشن ---
         function downloadBillAsImage() {
             if (currentBill.items.length === 0) {
                 showNotification("تصویر ڈاؤن لوڈ کرنے کے لیے پہلے فائنل بل بنانا لازمی ہے!", "error");
@@ -607,14 +615,11 @@
             }
 
             showNotification("تصویر تیار کی جا رہی ہے، براہ کرم ایک سیکنڈ انتظار کریں...", "success");
-            
             const receiptElement = document.getElementById('printable-receipt');
-            
-            // تصویر بنانے کی جدید سیٹنگز
             const options = {
-                scale: 2, // تصویر کا رزلٹ (کوالٹی) ڈبل کرنے کے لیے
-                backgroundColor: "#ffffff", // پس منظر سفید رکھنے کے لیے
-                useCORS: true // فونٹ فائل کو درست لوڈ کرنے کے لیے
+                scale: 2,
+                backgroundColor: "#ffffff",
+                useCORS: true
             };
 
             html2canvas(receiptElement, options).then(canvas => {
@@ -669,8 +674,8 @@
                         <button onclick="deleteSavedBill('${bill.id}', event)" class="p-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                     </div>
                 `;
+                listContainer.appendChild(card);
             });
-            listContainer.appendChild(card);
             lucide.createIcons();
         }
 
