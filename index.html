@@ -42,12 +42,10 @@
         }
 
         @media print {
-            /* اسکرین کا سب کچھ چھپائیں */
             body * {
                 display: none !important;
                 visibility: hidden !important;
             }
-            /* صرف پرنٹ ایریا کو ظاہر کریں */
             #perfect-print-area, #perfect-print-area * {
                 display: block !important;
                 visibility: visible !important;
@@ -83,7 +81,6 @@
             transform: scale(0.92);
         }
         
-        /* سکول بار کو خوبصورت بنانا */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -150,9 +147,8 @@
                         </select>
                     </div>
 
-                    <!-- کسٹم نام داخل کرنے کا خانہ -->
                     <div id="custom-name-container" class="hidden">
-                        <input type="text" id="custom-item-name" placeholder="یہاں آئٹم کا نام لکھیں..." class="w-full px-2 py-1 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs font-medium">
+                        <input type="text" id="custom-item-name" placeholder="یہاں آئٹم کا نام لکھیں..." class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs font-medium">
                     </div>
 
                     <!-- فوری انتخاب ٹیگز -->
@@ -193,13 +189,13 @@
                     <button onclick="pressNum('6')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">6</button>
                     <button onclick="pressOperator('-')" class="calc-btn bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white font-bold py-2 rounded-xl text-sm text-center shadow-sm transition-all">-</button>
 
-                    <button onclick="pressNum('1')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">1</button>
-                    <button onclick="pressNum('2')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">2</button>
-                    <button onclick="pressNum('3')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">3</button>
+                    <button onclick="pressNum('1')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">1</button>
+                    <button onclick="pressNum('2')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">2</button>
+                    <button onclick="pressNum('3')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">3</button>
                     <button onclick="pressOperator('+')" class="calc-btn bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white font-bold py-2 rounded-xl text-sm text-center shadow-sm transition-all">+</button>
 
-                    <button onclick="pressNum('0')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">0</button>
-                    <button onclick="pressNum('.')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">.</button>
+                    <button onclick="pressNum('0')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">0</button>
+                    <button onclick="pressNum('.')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">.</button>
                     <button id="add-to-ledger-btn" onclick="addCurrentToLedger()" class="calc-btn col-span-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-2 rounded-xl text-sm flex items-center justify-center gap-1 shadow-md transition-all">
                         <i id="btn-icon" data-lucide="plus-circle" class="w-4 h-4"></i>
                         <span id="btn-text">فہرست میں شامل کریں</span>
@@ -245,15 +241,29 @@
             <!-- ڈیجیٹل رسید کارڈ -->
             <div id="receipt-card" class="bg-white rounded-2xl shadow-lg border-t-4 border-pink-500 p-4 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
                 
-                <!-- اسکرین پر نظر آنے والی فائنل رسید (اور تصویر ڈاؤن لوڈ کرنے کا ہینڈلر) -->
+                <!-- کسٹمر نام داخل کرنے کا سیکشن -->
+                <div class="bg-gradient-to-r from-pink-50 to-indigo-50/50 p-2.5 rounded-xl border border-pink-100/60 mb-2 no-print flex flex-col sm:flex-row items-center gap-2">
+                    <label class="text-xs font-bold text-pink-700 flex items-center gap-1 shrink-0">
+                        <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                        خریدار / کسٹمر کا نام لکھیں:
+                    </label>
+                    <input type="text" id="customer-name-input" oninput="updateCustomerName(this.value)" placeholder="کسٹمر کا نام درج کریں..." class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 font-medium">
+                </div>
+
+                <!-- اسکرین پر نظر آنے والی فائنل رسید -->
                 <div id="screen-receipt-view" class="space-y-4 bg-gradient-to-b from-white to-slate-50/50 p-4 rounded-xl border border-slate-100">
-                    <!-- رسید کا برانڈڈ ہیڈر (اب یہاں بھی دکان کا نام اور پتہ سیٹ ہے) -->
+                    <!-- رسید کا برانڈڈ ہیڈر -->
                     <div class="text-center pb-3 border-b border-dashed border-slate-300">
                         <h2 class="heading-urdu text-2xl font-bold text-slate-900 tracking-wide">نیو قاری ہوزری سٹور</h2>
                         <p class="text-xs text-slate-600 font-medium">نزد مبارک مسجد قائد اعظم مارکیٹ فیصل آباد</p>
                         <p class="text-xs text-indigo-700 font-bold font-mono mt-0.5">موبائل نمبر : 03065378112</p>
                         
-                        <div class="grid grid-cols-2 text-xs text-slate-500 mt-3 text-right bg-slate-100/70 p-1.5 rounded-lg border border-slate-200/50">
+                        <!-- کسٹمر کا لائیو نام ڈسپلے -->
+                        <div id="customer-name-display-row" class="hidden mt-2 bg-indigo-50/60 text-indigo-950 text-xs px-3 py-1 rounded-md border border-indigo-100 font-bold text-right">
+                            <span>محترم خریدار: </span> <span id="customer-name-label" class="text-pink-700">--</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 text-xs text-slate-500 mt-2 text-right bg-slate-100/70 p-1.5 rounded-lg border border-slate-200/50">
                             <div>
                                 <span class="font-bold text-slate-600">بل نمبر:</span> <span id="bill-id-display" class="font-mono text-pink-700 font-bold">--</span>
                             </div>
@@ -335,13 +345,13 @@
                 </div>
             </div>
 
-            <!-- محفوظ شدہ بلوں کا ریکارڈ -->
+            <!-- محفوظ شدہ بلوں کا مستقل ریکارڈ کی فہرست -->
             <div class="bg-white rounded-2xl shadow-md border-t-4 border-slate-400 p-4">
                 <h3 class="font-bold text-base text-slate-700 flex items-center gap-1.5 mb-3 pb-1.5 border-b border-slate-100">
                     <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
-                    محفوظ شدہ پرانے بلوں کا ریکارڈ
+                    محفوظ شدہ پرانے بلوں کا ریکارڈ (مستقل کھاتہ)
                 </h3>
-                <div id="saved-bills-list" class="space-y-2 max-h-[160px] overflow-y-auto pr-0.5 text-xs">
+                <div id="saved-bills-list" class="space-y-2 max-h-[180px] overflow-y-auto pr-0.5 text-xs">
                     <div class="text-center py-4 text-slate-400">
                         ابھی تک کوئی پرانا بل محفوظ نہیں کیا گیا۔
                     </div>
@@ -350,13 +360,16 @@
         </div>
     </main>
 
-    <!-- 📥 خصوصی خفیہ برنٹ برانڈڈ ایریا (جو فائنل پیپر پر پرنٹ ہوگا) -->
+    <!-- 📥 خصوصی خفیہ پرنٹ برانڈڈ ایریا -->
     <div id="perfect-print-area">
         <div style="text-align: center; border-bottom: 2px dashed #000000; padding-bottom: 12px; margin-bottom: 15px;">
-            <!-- آپ کی دکان کا نام بولڈ فونٹ میں -->
             <h2 style="font-size: 26px; font-weight: bold; margin: 0; padding: 0;">نیو قاری ہوزری سٹور</h2>
             <p style="font-size: 14px; margin: 4px 0 0 0; color: #333333; font-weight: 500;">نزد مبارک مسجد قائد اعظم مارکیٹ فیصل آباد</p>
             <p style="font-size: 14px; margin: 2px 0 0 0; color: #000000; font-family: monospace; font-weight: bold;">موبائل نمبر : 03065378112</p>
+            
+            <div id="print-customer-row" style="display: none; text-align: right; background: #f9f9f9; padding: 6px 10px; margin-top: 10px; border-radius: 6px; font-size: 14px; font-weight: bold; border: 1px solid #eee;">
+                <span>خریدار کا نام: </span> <span id="print-customer-name">--</span>
+            </div>
             
             <table style="width: 100%; font-size: 13px; margin-top: 15px; text-align: right;">
                 <tr>
@@ -417,7 +430,7 @@
         });
 
         let ledgerItems = [];
-        let currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0 };
+        let currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0, customerName: "" };
         let savedBills = [];
         let calcInput = "0";
         let isNewInput = true;
@@ -425,11 +438,30 @@
 
         function generateBillId() { return 'BILL-' + Math.floor(100000 + Math.random() * 900000); }
 
+        // پیج لوڈ پر مستقل ڈیٹا کو براؤزر میموری سے نکالنا
         window.onload = function() {
             lucide.createIcons();
             updateBillUIDisplay();
             loadSavedBillsFromLocalStorage();
         };
+
+        function updateCustomerName(name) {
+            currentBill.customerName = name.trim();
+            const displayRow = document.getElementById('customer-name-display-row');
+            const label = document.getElementById('customer-name-label');
+            const printRow = document.getElementById('print-customer-row');
+            const printLabel = document.getElementById('print-customer-name');
+
+            if (currentBill.customerName !== "") {
+                displayRow.classList.remove('hidden');
+                label.innerText = currentBill.customerName;
+                printRow.style.display = "block";
+                printLabel.innerText = currentBill.customerName;
+            } else {
+                displayRow.classList.add('hidden');
+                printRow.style.display = "none";
+            }
+        }
 
         function showNotification(message, type = 'success') {
             const toast = document.getElementById('toast-message');
@@ -604,7 +636,11 @@
         function generateBillFromLedger() {
             if (ledgerItems.length === 0) { showNotification("بل بنانے سے پہلے فہرست میں کچھ آئٹمز شامل کریں!", "error"); return; }
             currentBill.items = JSON.parse(JSON.stringify(ledgerItems));
-            currentBill.id = generateBillId();
+            
+            // اگر کوئی بل پہلے سے لوڈڈ نہیں ہے تب نئی آئی ڈی بنائیں، ورنہ اسی آئی ڈی کو ایڈٹ موڈ میں رکھیں
+            if (!currentBill.id || currentBill.id === "--") {
+                currentBill.id = generateBillId();
+            }
             currentBill.date = new Date().toLocaleString('ur-PK');
             calculateTotals();
             showNotification("مبارک ہو! حساب کتاب کی فائنل رسید تیار ہو گئی ہے۔");
@@ -622,7 +658,7 @@
 
             currentBill.subtotal = subtotal; currentBill.discount = discountPct; currentBill.tax = taxPct; currentBill.grandTotal = grandTotal;
 
-            // اسکرین ویوز اپ ڈیٹ کرنا
+            // اسکرین اپڈیٹس
             document.getElementById('subtotal-val').innerText = subtotal.toFixed(2);
             document.getElementById('grandtotal-val').innerText = grandTotal.toFixed(2);
             document.getElementById('print-discount-pct').innerText = discountPct;
@@ -632,7 +668,7 @@
             document.getElementById('print-discount-row').style.display = discountPct > 0 ? 'flex' : 'none';
             document.getElementById('print-tax-row').style.display = taxPct > 0 ? 'flex' : 'none';
 
-            // 📥 برانڈڈ خفیہ پرنٹ ڈیٹا اپڈیٹ
+            // برانڈڈ خفیہ پرنٹ ڈیٹا اپڈیٹ
             document.getElementById('print-bill-id').innerText = currentBill.id;
             document.getElementById('print-bill-date').innerText = currentBill.date;
             document.getElementById('print-subtotal-val').innerText = subtotal.toFixed(2);
@@ -691,9 +727,15 @@
         }
 
         function resetBill() {
-            currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0 };
-            ledgerItems = []; document.getElementById('discount-pct').value = 0; document.getElementById('tax-pct').value = 0;
-            updateLedgerUI(); calculateTotals(); showNotification("تمام پرانا ڈیٹا صاف کر کے نیا بل فارمیٹ کھول دیا گیا ہے۔");
+            currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0, customerName: "" };
+            ledgerItems = []; 
+            document.getElementById('discount-pct').value = 0; 
+            document.getElementById('tax-pct').value = 0;
+            document.getElementById('customer-name-input').value = "";
+            updateCustomerName("");
+            updateLedgerUI(); 
+            calculateTotals(); 
+            showNotification("تمام پرانا ڈیٹا صاف کر کے نیا بل فارمیٹ کھول دیا گیا ہے۔");
         }
 
         function printBill() {
@@ -701,32 +743,54 @@
             window.print();
         }
 
+        // 💾 مستقل ریکارڈ کو لوکل سٹوریج میں محفوظ کرنے کا لاجک
         function saveCurrentBill() {
             if (currentBill.items.length === 0) { showNotification("خالی بل کو محفوظ نہیں کیا جا سکتا!", "error"); return; }
+            
+            // چیک کریں کہ آیا یہ آئی ڈی پہلے سے موجود ہے تو اسے اوور رائیٹ (اپڈیٹ) کریں
             const existingIndex = savedBills.findIndex(b => b.id === currentBill.id);
-            const billToSave = JSON.parse(JSON.stringify(currentBill));
-            if (existingIndex > -1) { savedBills[existingIndex] = billToSave; showNotification("محفوظ شدہ بل کو اپ ڈیٹ کر دیا گیا ہے۔"); } 
-            else { savedBills.unshift(billToSave); showNotification("بل کامیابی سے مستقل ریکارڈ میں محفوظ کر لیا گیا ہے۔"); }
-            saveSavedBillsToLocalStorage(); renderSavedBillsList();
+            const billToSave = JSON.parse(JSON.stringify(currentBill)); // گہرا کاپی
+
+            if (existingIndex > -1) {
+                savedBills[existingIndex] = billToSave;
+                showNotification("محفوظ شدہ بل کو کامیابی سے اپ ڈیٹ کر دیا گیا ہے۔", "success");
+            } else {
+                savedBills.unshift(billToSave); // ہسٹری میں سب سے اوپر لے آئیں
+                showNotification("بل کھاتہ ہسٹری میں مستقل طور پر محفوظ کر لیا گیا ہے۔", "success");
+            }
+
+            saveSavedBillsToLocalStorage();
+            renderSavedBillsList();
         }
 
+        // براؤزر میں ڈیٹا لسٹ ظاہر کرنے کا مینیجر
         function renderSavedBillsList() {
             const listContainer = document.getElementById('saved-bills-list');
             listContainer.innerHTML = "";
-            if (savedBills.length === 0) { listContainer.innerHTML = `<div class="text-center py-4 text-slate-400">ابھی تک کوئی پرانا بل محفوظ نہیں کیا گیا۔</div>`; return; }
+
+            if (savedBills.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-4 text-slate-400">ابھی تک کوئی پرانا بل محفوظ نہیں کیا گیا۔</div>`;
+                return;
+            }
+
             savedBills.forEach(bill => {
+                const customerString = bill.customerName ? ` | خریدار: ${bill.customerName}` : " | عام کسٹمر";
                 const card = document.createElement('div');
-                card.className = "p-2 bg-slate-50 border border-slate-200 rounded-xl hover:border-indigo-400 transition duration-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs";
+                card.className = "p-2.5 bg-slate-50 border border-slate-200 rounded-xl hover:border-indigo-400 transition duration-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs shadow-2xs";
+                
                 card.innerHTML = `
                     <div onclick="loadSavedBill('${bill.id}')" class="cursor-pointer flex-grow space-y-0.5 w-full text-right">
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-slate-800">${bill.id}</span>
-                            <span class="text-indigo-700 font-bold font-mono">روپے ${bill.grandTotal.toFixed(2)}</span>
+                            <span class="font-bold text-slate-800 text-sm">${bill.id}</span>
+                            <span class="text-indigo-700 font-bold font-mono text-sm">روپے ${bill.grandTotal.toFixed(2)}</span>
                         </div>
-                        <div class="flex justify-between text-2xs text-slate-400"><span>تاریخ: ${bill.date.split(',')[0]}</span><span>آئٹمز: ${bill.items.length}</span></div>
+                        <div class="flex justify-between text-2xs text-slate-400">
+                            <span>تاریخ: ${bill.date.split(',')[0]}${customerString}</span>
+                            <span>کل آئٹمز: ${bill.items.length}</span>
+                        </div>
                     </div>
-                    <div class="flex gap-1.5 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-1.5 sm:pt-0 border-slate-200/60">
-                        <button onclick="loadSavedBill('${bill.id}')" class="p-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition flex items-center gap-1 text-2xs px-2"><i data-lucide="eye" class="w-3 h-3"></i> دیکھیں</button>
+                    <div class="flex gap-1 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-1.5 sm:pt-0 border-slate-200/60">
+                        <button onclick="loadSavedBill('${bill.id}')" class="p-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition flex items-center gap-0.5 text-2xs px-2 font-bold"><i data-lucide="eye" class="w-3 h-3"></i> ریکارڈ دیکھیں</button>
                         <button onclick="deleteSavedBill('${bill.id}', event)" class="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                     </div>
                 `;
@@ -735,28 +799,53 @@
             lucide.createIcons();
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            loadSavedBillsFromLocalStorage();
-        });
-
+        // محفوظ شدہ پرانے بل کو لائیو کھبوں میں دوبارہ لوڈ کرنا
         function loadSavedBill(billId) {
             const bill = savedBills.find(b => b.id === billId);
             if (bill) {
-                currentBill = JSON.parse(JSON.stringify(bill)); ledgerItems = JSON.parse(JSON.stringify(bill.items));
-                document.getElementById('discount-pct').value = currentBill.discount; document.getElementById('tax-pct').value = currentBill.tax;
-                updateLedgerUI(); calculateTotals(); showNotification(`${billId} کا فائنل بل لوڈ کر دیا گیا ہے۔`);
+                currentBill = JSON.parse(JSON.stringify(bill));
+                ledgerItems = JSON.parse(JSON.stringify(bill.items));
+                
+                // تمام فیلڈز اور ڈسپلے اپڈیٹ کریں
+                document.getElementById('discount-pct').value = currentBill.discount; 
+                document.getElementById('tax-pct').value = currentBill.tax;
+                document.getElementById('customer-name-input').value = currentBill.customerName || "";
+                
+                updateCustomerName(currentBill.customerName || "");
+                updateLedgerUI(); 
+                calculateTotals(); 
+                
+                showNotification(`${billId} مستقل ہسٹری سے کامیابی سے لوڈ ہو گیا ہے۔`, "success");
                 document.getElementById('receipt-card').scrollIntoView({ behavior: 'smooth' });
             }
         }
 
+        // مستقل ہسٹری سے بل حذف کرنا
         function deleteSavedBill(billId, event) {
-            event.stopPropagation(); savedBills = savedBills.filter(b => b.id !== billId);
-            saveSavedBillsToLocalStorage(); renderSavedBillsList(); showNotification("بل مستقل ریکارڈ سے حذف کر دیا گیا ہے۔");
+            event.stopPropagation(); // لوڈنگ لاجک کو چلنے سے روکیں
+            if (confirm("کیا آپ واقعی یہ بل مستقل ریکارڈ سے حذف کرنا چاہتے ہیں؟")) {
+                savedBills = savedBills.filter(b => b.id !== billId);
+                saveSavedBillsToLocalStorage();
+                renderSavedBillsList();
+                showNotification("بل مستقل ریکارڈ سے حذف کر دیا گیا ہے۔", "success");
+            }
         }
-        function saveSavedBillsToLocalStorage() { localStorage.setItem('billing_calculator_history', JSON.stringify(savedBills)); }
+
+        // لوکل سٹوریج رائٹ اور ریڈ لاجک
+        function saveSavedBillsToLocalStorage() {
+            localStorage.setItem('new_qari_hosiery_store_db', JSON.stringify(savedBills));
+        }
+
         function loadSavedBillsFromLocalStorage() {
-            const data = localStorage.getItem('billing_calculator_history');
-            if (data) { try { savedBills = JSON.parse(data); renderSavedBillsList(); } catch (e) { savedBills = []; } }
+            const data = localStorage.getItem('new_qari_hosiery_store_db');
+            if (data) {
+                try {
+                    savedBills = JSON.parse(data);
+                    renderSavedBillsList();
+                } catch (e) {
+                    savedBills = [];
+                }
+            }
         }
     </script>
 </body>
