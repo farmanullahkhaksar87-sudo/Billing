@@ -22,98 +22,122 @@
             font-display: swap;
         }
 
-        /* پورے صفحے پر جمیل نوری نستعلیق لاگو کرنا */
+        /* پورے صفحے پر جمیل نوری نستعلیق اور چھوٹا فونٹ سائز لاگو کرنا */
         body, input, select, button, textarea {
             font-family: 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'Jonameisl', 'Noto Nastaliq Urdu', serif !important;
         }
 
-        /* نستعلیق کی وجہ سے لائن کی اونچائی اور الفاظ کا سائز درست کرنا */
+        /* فونٹ سائز کو چھوٹا اور کامپیکٹ کیا گیا ہے */
         body {
-            font-size: 1.15rem;
-            line-height: 2.2;
+            font-size: 0.95rem;
+            line-height: 1.8;
         }
 
         .heading-urdu {
-            line-height: 2.5;
+            line-height: 2;
         }
 
-        /* پرنٹنگ کا ۱۰۰ فیصد درست اور ٹیسٹ شدہ کوڈ */
+        /* پرنٹ کے لیے کسٹم پیج بریک اور اسٹائلز */
+        #perfect-print-area {
+            display: none;
+        }
+
         @media print {
-            /* اسکرین کی تمام چیزیں چھپا دیں */
             body * {
+                display: none !important;
                 visibility: hidden !important;
             }
-            /* صرف فائنل رسید والے خانے اور اس کے اندر موجود تمام الفاظ کو دکھائیں */
-            #printable-receipt, #printable-receipt * {
+            #perfect-print-area, #perfect-print-area * {
+                display: block !important;
                 visibility: visible !important;
             }
-            /* رسید کو کاغذ کے بالکل اوپر بائیں کونے میں سیٹ کریں */
-            #printable-receipt {
+            #perfect-print-area table, #perfect-print-area th, #perfect-print-area td {
+                display: table !important;
+                visibility: visible !important;
+            }
+            #perfect-print-area tr {
+                display: table-row !important;
+                visibility: visible !important;
+            }
+            #perfect-print-area th, #perfect-print-area td {
+                display: table-cell !important;
+                visibility: visible !important;
+            }
+            #perfect-print-area {
                 position: absolute !important;
                 left: 0 !important;
                 top: 0 !important;
                 width: 100% !important;
-                border: none !important;
-                box-shadow: none !important;
-                padding: 0 !important;
                 margin: 0 !important;
-                background-color: #ffffff !important;
-            }
-            /* پرنٹ کے وقت غیر ضروری بٹنز اور فیلڈز کو غائب کرنا */
-            .no-print {
-                display: none !important;
-                visibility: hidden !important;
+                padding: 10px !important;
+                background: #ffffff !important;
+                color: #000000 !important;
             }
         }
 
         .calc-btn {
-            transition: all 0.15s ease;
+            transition: all 0.1s ease;
         }
         .calc-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
+        }
+        
+        /* سکول بار کو خوبصورت بنانا */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col pb-12">
+<body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-pink-50 text-slate-800 min-h-screen flex flex-col pb-12">
 
-    <!-- ہیڈر / سرورق -->
-    <header class="bg-gradient-to-r from-teal-600 to-emerald-700 text-white shadow-md py-4 px-4 no-print">
+    <!-- ہیڈر / سرورق (نیا برائٹ گریڈیئنٹ) -->
+    <header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg py-3 px-4 no-print">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
             <div class="text-center md:text-right">
-                <h1 class="heading-urdu text-3xl font-bold tracking-wide">جدید حساب کتاب اور ڈیجیٹل بل میکر</h1>
-                <p class="text-teal-100 text-base">پہلے کیلکولیٹر پر تسلی سے حساب کریں، پھر ایک کلک سے پکا بل تیار کریں</p>
+                <h1 class="heading-urdu text-2xl md:text-3xl font-bold tracking-wide drop-shadow-sm">جدید حساب کتاب اور ڈیجیٹل بل میکر</h1>
+                <p class="text-indigo-100 text-xs md:text-sm">پہلے کیلکولیٹر پر تسلی سے حساب کریں، پھر ایک کلک سے پکا بل تیار کریں</p>
             </div>
-            <div class="flex items-center gap-2 bg-emerald-800/40 px-4 py-1 rounded-lg border border-emerald-500/30">
-                <i data-lucide="calendar" class="w-5 h-5 text-emerald-300"></i>
-                <span id="live-date" class="font-medium text-base"></span>
+            <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-0.5 rounded-full border border-white/30 shadow-inner">
+                <i data-lucide="calendar" class="w-4 h-4 text-pink-200"></i>
+                <span id="live-date" class="font-medium text-xs md:text-sm"></span>
             </div>
         </div>
     </header>
 
     <!-- مرکزی کنٹینٹ گریڈ -->
-    <main class="max-w-7xl mx-auto w-full px-4 mt-8 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8 no-print">
+    <main class="max-w-7xl mx-auto w-full px-4 mt-6 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 no-print">
         
         <!-- بایاں کالم: کیلکولیٹر اور عارضی فہرست -->
-        <div class="lg:col-span-6 flex flex-col gap-6">
+        <div class="lg:col-span-5 flex flex-col gap-6">
             
             <!-- 1. اسمارٹ کیلکولیٹر اور آئٹم سلیکشن کارڈ -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                    <h2 class="font-bold text-xl text-slate-700 flex items-center gap-2">
-                        <i data-lucide="calculator" class="w-5 h-5 text-teal-600"></i>
+            <div class="bg-white rounded-2xl shadow-md border-t-4 border-indigo-500 p-4 transition-all hover:shadow-lg">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+                    <h2 class="font-bold text-base text-indigo-700 flex items-center gap-1.5">
+                        <i data-lucide="calculator" class="w-4 h-4 text-indigo-600"></i>
                         پروڈکٹ کا انتخاب اور کیلکولیٹر
                     </h2>
-                    <span class="text-sm bg-teal-50 text-teal-700 px-3 py-0.5 rounded-full font-medium">مرحلہ اول</span>
+                    <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-bold">مرحلہ اول</span>
                 </div>
 
                 <!-- آئٹم ڈراپ ڈاؤن اور کوئیک ٹیگز -->
-                <div class="mb-4 space-y-3">
+                <div class="mb-3 space-y-2.5">
                     <div>
-                        <label class="block text-base font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                            <i data-lucide="tag" class="w-4 h-4 text-emerald-600"></i>
+                        <label class="block text-xs font-bold text-slate-600 mb-1 flex items-center gap-1">
+                            <i data-lucide="tag" class="w-3.5 h-3.5 text-indigo-500"></i>
                             آئٹم کا نام چنیں:
                         </label>
-                        <select id="item-select" onchange="handleItemSelectChange()" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-base font-medium bg-slate-50">
+                        <select id="item-select" onchange="handleItemSelectChange()" class="w-full px-2 py-1 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs font-medium bg-slate-50/50">
                             <option value="جراب">جراب 🧦</option>
                             <option value="ٹوپی">ٹوپی 🧢</option>
                             <option value="دستانہ">دستانہ 🧤</option>
@@ -125,203 +149,200 @@
                         </select>
                     </div>
 
-                    <!-- مینوئل کسٹم نام داخل کرنے کا خانہ -->
+                    <!-- کسٹم نام داخل کرنے کا خانہ -->
                     <div id="custom-name-container" class="hidden">
-                        <input type="text" id="custom-item-name" placeholder="یہاں آئٹم کا نام لکھیں..." class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-base font-medium">
+                        <input type="text" id="custom-item-name" placeholder="یہاں آئٹم کا نام لکھیں..." class="w-full px-2 py-1 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs font-medium">
                     </div>
 
-                    <!-- فوری بٹن برائے انتخاب -->
+                    <!-- فوری انتخاب ٹیگز (رنگین ہائی لائٹڈ) -->
                     <div>
-                        <span class="block text-sm text-slate-400 font-semibold mb-1">فوری انتخاب کے لیے نیچے کلک کریں:</span>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="selectQuickItem('جراب')" class="quick-tag-btn px-4 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-full text-sm font-medium transition border border-slate-200/60">جراب</button>
-                            <button onclick="selectQuickItem('ٹوپی')" class="quick-tag-btn px-4 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-full text-sm font-medium transition border border-slate-200/60">ٹوپی</button>
-                            <button onclick="selectQuickItem('دستانہ')" class="quick-tag-btn px-4 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-full text-sm font-medium transition border border-slate-200/60">دستانہ</button>
-                            <button onclick="selectQuickItem('کیپ')" class="quick-tag-btn px-4 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-full text-sm font-medium transition border border-slate-200/60">کیپ</button>
-                            <button onclick="selectQuickItem('بنیان')" class="quick-tag-btn px-4 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-full text-sm font-medium transition border border-slate-200/60">بنیان</button>
-                            <button onclick="selectQuickItem('پاجامہ')" class="quick-tag-btn px-4 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-full text-sm font-medium transition border border-slate-200/60">پاجامہ</button>
-                            <button onclick="selectQuickItem('ہائی نیک')" class="quick-tag-btn px-4 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-full text-sm font-medium transition border border-slate-200/60">ہائی نیک</button>
+                        <div class="flex flex-wrap gap-1">
+                            <button onclick="selectQuickItem('جراب')" class="quick-tag-btn px-2.5 py-0.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white rounded-lg text-xs font-medium transition-all border border-indigo-100 shadow-sm">جراب</button>
+                            <button onclick="selectQuickItem('ٹوپی')" class="quick-tag-btn px-2.5 py-0.5 bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white rounded-lg text-xs font-medium transition-all border border-purple-100 shadow-sm">ٹوپی</button>
+                            <button onclick="selectQuickItem('دستانہ')" class="quick-tag-btn px-2.5 py-0.5 bg-pink-50 hover:bg-pink-600 text-pink-700 hover:text-white rounded-lg text-xs font-medium transition-all border border-pink-100 shadow-sm">دستانہ</button>
+                            <button onclick="selectQuickItem('کیپ')" class="quick-tag-btn px-2.5 py-0.5 bg-fuchsia-50 hover:bg-fuchsia-600 text-fuchsia-700 hover:text-white rounded-lg text-xs font-medium transition-all border border-fuchsia-100 shadow-sm">کیپ</button>
+                            <button onclick="selectQuickItem('بنیان')" class="quick-tag-btn px-2.5 py-0.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-lg text-xs font-medium transition-all border border-blue-100 shadow-sm">بنیان</button>
+                            <button onclick="selectQuickItem('پاجامہ')" class="quick-tag-btn px-2.5 py-0.5 bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white rounded-lg text-xs font-medium transition-all border border-teal-100 shadow-sm">پاجامہ</button>
+                            <button onclick="selectQuickItem('ہائی نیک')" class="quick-tag-btn px-2.5 py-0.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white rounded-lg text-xs font-medium transition-all border border-emerald-100 shadow-sm">ہائی نیک</button>
                         </div>
                     </div>
                 </div>
                 
                 <!-- کیلکولیٹر اسکرین -->
-                <div class="bg-slate-900 text-white p-4 rounded-xl mb-4 text-left font-mono relative">
-                    <div id="calc-history" class="text-slate-400 text-xs min-h-[1.5rem] break-all"></div>
-                    <div id="calc-screen" class="text-3xl font-bold tracking-wider truncate mt-1">0</div>
+                <div class="bg-slate-900 text-white p-3 rounded-xl mb-3 text-left font-mono relative shadow-inner border border-slate-800">
+                    <div id="calc-history" class="text-slate-500 text-2xs min-h-[1.2rem] break-all"></div>
+                    <div id="calc-screen" class="text-2xl font-bold tracking-wider truncate mt-0.5 text-emerald-400">0</div>
                 </div>
 
-                <!-- کیلکولیٹر کی بورڈ -->
-                <div class="grid grid-cols-4 gap-2 mb-4">
-                    <button onclick="clearCalc()" class="calc-btn col-span-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold py-2 rounded-lg text-center text-xl">صاف کریں (C)</button>
-                    <button onclick="pressOperator('/')" class="calc-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold py-2 rounded-lg text-xl text-center">÷</button>
-                    <button onclick="deleteLast()" class="calc-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold py-2 rounded-lg text-xl text-center flex items-center justify-center">
-                        <i data-lucide="delete" class="w-5 h-5"></i>
+                <!-- کیلکولیٹر کی بورڈ (رنگین بٹنز) -->
+                <div class="grid grid-cols-4 gap-1.5">
+                    <button onclick="clearCalc()" class="calc-btn col-span-2 bg-rose-100 text-rose-700 hover:bg-rose-600 hover:text-white font-bold py-1.5 rounded-xl text-center text-sm shadow-sm transition-all">صاف کریں (C)</button>
+                    <button onclick="pressOperator('/')" class="calc-btn bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white font-bold py-1.5 rounded-xl text-sm text-center shadow-sm transition-all">÷</button>
+                    <button onclick="deleteLast()" class="calc-btn bg-amber-100 text-amber-800 hover:bg-amber-600 hover:text-white font-bold py-1.5 rounded-xl text-sm text-center flex items-center justify-center shadow-sm transition-all">
+                        <i data-lucide="delete" class="w-4 h-4"></i>
                     </button>
 
-                    <button onclick="pressNum('7')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">7</button>
-                    <button onclick="pressNum('8')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">8</button>
-                    <button onclick="pressNum('9')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">9</button>
-                    <button onclick="pressOperator('*')" class="calc-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold py-2 rounded-lg text-xl text-center">×</button>
+                    <button onclick="pressNum('7')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">7</button>
+                    <button onclick="pressNum('8')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">8</button>
+                    <button onclick="pressNum('9')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">9</button>
+                    <button onclick="pressOperator('*')" class="calc-btn bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white font-bold py-2 rounded-xl text-sm text-center shadow-sm transition-all">×</button>
 
-                    <button onclick="pressNum('4')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">4</button>
-                    <button onclick="pressNum('5')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">5</button>
-                    <button onclick="pressNum('6')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">6</button>
-                    <button onclick="pressOperator('-')" class="calc-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold py-2 rounded-lg text-xl text-center">-</button>
+                    <button onclick="pressNum('4')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">4</button>
+                    <button onclick="pressNum('5')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">5</button>
+                    <button onclick="pressNum('6')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">6</button>
+                    <button onclick="pressOperator('-')" class="calc-btn bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white font-bold py-2 rounded-xl text-sm text-center shadow-sm transition-all">-</button>
 
-                    <button onclick="pressNum('1')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">1</button>
-                    <button onclick="pressNum('2')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">2</button>
-                    <button onclick="pressNum('3')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">3</button>
-                    <button onclick="pressOperator('+')" class="calc-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold py-2 rounded-lg text-xl text-center">+</button>
+                    <button onclick="pressNum('1')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">1</button>
+                    <button onclick="pressNum('2')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">2</button>
+                    <button onclick="pressNum('3')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">3</button>
+                    <button onclick="pressOperator('+')" class="calc-btn bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white font-bold py-2 rounded-xl text-sm text-center shadow-sm transition-all">+</button>
 
-                    <button onclick="pressNum('0')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">0</button>
-                    <button onclick="pressNum('.')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-slate-200 font-semibold py-2 rounded-lg text-xl text-center">.</button>
-                    <button id="add-to-ledger-btn" onclick="addCurrentToLedger()" class="calc-btn col-span-2 bg-teal-600 text-white hover:bg-teal-700 font-bold py-2 rounded-lg text-lg flex items-center justify-center gap-1.5 shadow-md">
-                        <i id="btn-icon" data-lucide="plus-circle" class="w-5 h-5"></i>
-                        <span id="btn-text">فهرست میں شامل کریں</span>
+                    <button onclick="pressNum('0')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">0</button>
+                    <button onclick="pressNum('.')" class="calc-btn bg-slate-100 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">.</button>
+                    <button id="add-to-ledger-btn" onclick="addCurrentToLedger()" class="calc-btn col-span-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-2 rounded-xl text-sm flex items-center justify-center gap-1 shadow-md transition-all">
+                        <i id="btn-icon" data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span id="btn-text">فہرست میں شامل کریں</span>
                     </button>
                 </div>
             </div>
 
             <!-- 2. عارضی کچے حساب کی فہرست -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex-grow flex flex-col justify-between min-h-[320px]">
+            <div class="bg-white rounded-2xl shadow-md border-t-4 border-purple-500 p-4 flex-grow flex flex-col justify-between min-h-[280px]">
                 <div>
-                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                        <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2">
-                            <i data-lucide="list-todo" class="w-5 h-5 text-emerald-600"></i>
+                    <div class="flex justify-between items-center mb-3 pb-1.5 border-b border-slate-100">
+                        <h3 class="font-bold text-base text-purple-700 flex items-center gap-1.5">
+                            <i data-lucide="list-todo" class="w-4 h-4 text-purple-600"></i>
                             زیرِ کار کچے حساب کی فہرست
                         </h3>
-                        <span id="ledger-count" class="text-sm bg-slate-100 text-slate-600 px-3 py-0.5 rounded-full font-semibold">0 رقمیں</span>
+                        <span id="ledger-count" class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-bold">0 رقمیں</span>
                     </div>
 
-                    <!-- خالی فہرست کا مستقل کارڈ -->
-                    <div id="ledger-empty" class="text-center py-12 text-slate-400 text-base">
-                        <i data-lucide="calculator" class="w-10 h-10 mx-auto stroke-1 opacity-50 mb-2"></i>
-                        <p>کوئی رقم موجود نہیں ہے۔ اوپر پروڈکٹ منتخب کر کے حساب لکھیں اور "فهرست میں شامل کریں" پر کلک کریں۔</p>
+                    <!-- خالی فہرست کارڈ -->
+                    <div id="ledger-empty" class="text-center py-8 text-slate-400 text-sm">
+                        <i data-lucide="shopping-cart" class="w-8 h-8 mx-auto stroke-1 opacity-40 mb-1.5"></i>
+                        <p>کوئی رقم موجود نہیں ہے۔ پروڈکٹ منتخب کر کے "فہرست میں شامل کریں" دبائیں۔</p>
                     </div>
 
                     <!-- لسٹ کے آئٹمز کا کنٹینر -->
-                    <div class="space-y-3 max-h-[250px] overflow-y-auto pl-1 hidden" id="ledger-items-container"></div>
+                    <div class="space-y-2 max-h-[220px] overflow-y-auto pl-0.5 hidden" id="ledger-items-container"></div>
                 </div>
 
-                <!-- بل بنانے کا مین بٹن -->
-                <div class="mt-6 pt-4 border-t border-slate-100">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-base font-semibold text-slate-500">مجموعی کچی رقم:</span>
-                        <span class="font-mono text-2xl font-bold text-slate-800">روپے <span id="ledger-running-total">0.00</span></span>
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-slate-500">مجموعی کچی رقم:</span>
+                        <span class="font-mono text-lg font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-lg border border-purple-100">روپے <span id="ledger-running-total">0.00</span></span>
                     </div>
-                    <button onclick="generateBillFromLedger()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-3 px-4 rounded-xl font-bold text-xl shadow-md flex items-center justify-center gap-2 transition-all">
-                        <i data-lucide="receipt" class="w-6 h-6"></i>
+                    <button onclick="generateBillFromLedger()" class="w-full bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-4 rounded-xl font-bold text-base shadow-md flex items-center justify-center gap-1.5 transition-all">
+                        <i data-lucide="receipt" class="w-4 h-4"></i>
                         اس پورے حساب کا باقاعدہ فائنل بل بنائیں 🧾
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- دایاں کالم: فائنل رسید اور ہسٹری -->
-        <div class="lg:col-span-6 flex flex-col gap-6">
+        <!-- دایاں کالم: اسکرین رسید اور ہسٹری -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
             
             <!-- ڈیجیٹل رسید کارڈ -->
-            <div id="receipt-card" class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
-                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-600"></div>
-
-                <!-- پرنٹ ایبل حصہ (ID کو مرکزی کنٹینر پر لگایا گیا ہے تاکہ پرنٹ خالی نہ آئے) -->
-                <div id="printable-receipt" class="space-y-6 bg-white p-2 rounded-xl">
+            <div id="receipt-card" class="bg-white rounded-2xl shadow-lg border-t-4 border-pink-500 p-4 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
+                
+                <!-- اسکرین پر نظر آنے والی فائنل رسید -->
+                <div id="screen-receipt-view" class="space-y-4 bg-gradient-to-b from-white to-slate-50/50 p-3 rounded-xl border border-slate-100">
                     <!-- رسید کا ہیڈر -->
-                    <div class="text-center pb-4 border-b border-dashed border-slate-200">
-                        <h2 class="heading-urdu text-3xl font-bold text-slate-800">حساب کتاب کی فائنل رسید</h2>
-                        <p class="text-sm text-slate-400">ڈجیٹل بلنگ سسٹم</p>
-                        <div class="grid grid-cols-2 text-sm text-slate-500 mt-4 text-right">
+                    <div class="text-center pb-3 border-b border-dashed border-slate-300">
+                        <h2 class="heading-urdu text-2xl font-bold text-slate-800">حساب کتاب کی فائنل رسید</h2>
+                        <p class="text-2xs text-slate-400 -mt-1 tracking-wider">DIGITAL BILLING SYSTEM</p>
+                        <div class="grid grid-cols-2 text-xs text-slate-500 mt-3 text-right bg-slate-100/70 p-1.5 rounded-lg border border-slate-200/50">
                             <div>
-                                <span class="font-bold">بل نمبر:</span> <span id="bill-id-display" class="font-mono">--</span>
+                                <span class="font-bold text-slate-600">بل نمبر:</span> <span id="bill-id-display" class="font-mono text-pink-700 font-bold">--</span>
                             </div>
                             <div class="text-left">
-                                <span class="font-bold">تاریخ:</span> <span id="bill-date-display">--</span>
+                                <span class="font-bold text-slate-600">تاریخ:</span> <span id="bill-date-display" class="text-slate-700">--</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- فائنل ٹیبل -->
-                    <div class="overflow-x-auto min-h-[180px]">
-                        <table class="w-full text-base text-right">
+                    <div class="overflow-x-auto min-h-[160px]">
+                        <table class="w-full text-xs md:text-sm text-right">
                             <thead>
-                                <tr class="text-slate-500 border-b border-slate-100 pb-2">
-                                    <th class="pb-2 font-bold text-lg">آئٹم کا نام</th>
-                                    <th class="pb-2 text-left font-bold text-lg">تفصیلِ حساب (تعداد × قیمت = کل رقم)</th>
+                                <tr class="text-slate-500 border-b border-slate-200 pb-1.5">
+                                    <th class="pb-1.5 font-bold text-slate-700">آئٹم کا نام</th>
+                                    <th class="pb-1.5 text-left font-bold text-slate-700">تفصیلِ حساب (تعداد × قیمت = کل رقم)</th>
                                 </tr>
                             </thead>
-                            <tbody id="bill-items-body" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="bill-items-body" class="divide-y divide-slate-100 text-xs"></tbody>
                         </table>
-                        <div id="empty-state" class="text-center py-12 text-slate-400 text-base">
-                            <i data-lucide="receipt" class="w-12 h-12 mx-auto stroke-1 opacity-60 mb-2"></i>
+                        <div id="empty-state" class="text-center py-10 text-slate-400 text-xs">
+                            <i data-lucide="receipt" class="w-10 h-10 mx-auto stroke-1 opacity-50 mb-1.5"></i>
                             <p>ابھی تک کوئی پکا بل تیار نہیں کیا گیا ہے۔</p>
                         </div>
                     </div>
 
                     <!-- مجموعی رقم کا حساب کتاب -->
-                    <div class="border-t border-dashed border-slate-200 pt-4 space-y-2">
-                        <div class="flex justify-between text-base text-slate-600">
-                            <span>ٹوٹل رقم (Subtotal):</span>
-                            <span class="font-mono font-medium">روپے <span id="subtotal-val">0.00</span></span>
+                    <div class="border-t border-dashed border-slate-300 pt-3 space-y-1.5 text-xs">
+                        <div class="flex justify-between text-slate-600">
+                            <span class="font-medium">ٹوٹل رقم (Subtotal):</span>
+                            <span class="font-mono font-bold text-slate-700">روپے <span id="subtotal-val">0.00</span></span>
                         </div>
                         
-                        <div class="grid grid-cols-2 items-center gap-4 py-1 no-print">
-                            <div class="flex items-center gap-2">
-                                <label class="text-sm text-slate-500 font-bold shrink-0">رعایت / ڈسکاؤنٹ (%)</label>
-                                <input type="number" id="discount-pct" min="0" max="100" value="0" oninput="calculateTotals()" class="w-16 px-2 py-0.5 border border-slate-200 rounded text-center text-sm font-mono">
+                        <div class="grid grid-cols-2 items-center gap-4 py-1 bg-slate-100/50 p-2 rounded-xl border border-slate-200/40">
+                            <div class="flex items-center gap-1.5">
+                                <label class="text-2xs font-bold text-slate-600 shrink-0">رعایت (%)</label>
+                                <input type="number" id="discount-pct" min="0" max="100" value="0" oninput="calculateTotals()" class="w-12 px-1 py-0.5 border border-slate-200 rounded text-center font-mono focus:ring-1 focus:ring-pink-500 focus:outline-none">
                             </div>
-                            <div class="flex items-center gap-2 justify-end">
-                                <label class="text-sm text-slate-500 font-bold shrink-0">ٹیکس (%)</label>
-                                <input type="number" id="tax-pct" min="0" max="100" value="0" oninput="calculateTotals()" class="w-16 px-2 py-0.5 border border-slate-200 rounded text-center text-sm font-mono">
+                            <div class="flex items-center gap-1.5 justify-end">
+                                <label class="text-2xs font-bold text-slate-600 shrink-0">ٹیکس (%)</label>
+                                <input type="number" id="tax-pct" min="0" max="100" value="0" oninput="calculateTotals()" class="w-12 px-1 py-0.5 border border-slate-200 rounded text-center font-mono focus:ring-1 focus:ring-pink-500 focus:outline-none">
                             </div>
                         </div>
 
-                        <!-- تصویر اور پرنٹ پر ڈسکاؤنٹ اور ٹیکس کا سادہ ڈسپلے -->
-                        <div id="print-discount-row" class="flex justify-between text-sm text-slate-500">
-                            <span>ڈسکاؤنٹ (<span id="print-discount-pct">0</span>%):</span>
-                            <span class="font-mono">- روپے <span id="print-discount-val">0.00</span></span>
+                        <!-- تصویر پر فیلڈز شو ہونا -->
+                        <div id="print-discount-row" class="flex justify-between text-slate-500 text-2xs">
+                            <span>رعایت (<span id="print-discount-pct">0</span>%):</span>
+                            <span class="font-mono text-rose-600">- روپے <span id="print-discount-val">0.00</span></span>
                         </div>
-                        <div id="print-tax-row" class="flex justify-between text-sm text-slate-500">
+                        <div id="print-tax-row" class="flex justify-between text-slate-500 text-2xs">
                             <span>ٹیکس (<span id="print-tax-pct">0</span>%):</span>
-                            <span class="font-mono">+ روپے <span id="print-tax-val">0.00</span></span>
+                            <span class="font-mono text-emerald-600">+ روپے <span id="print-tax-val">0.00</span></span>
                         </div>
 
-                        <div class="flex justify-between text-xl font-bold text-slate-800 pt-2 border-t border-slate-100">
-                            <span>کل قابلِ ادائیگی رقم:</span>
-                            <span class="font-mono text-emerald-700 text-2xl">روپے <span id="grandtotal-val">0.00</span></span>
+                        <div class="flex justify-between font-bold text-slate-800 pt-2 border-t border-slate-200 bg-emerald-50/50 p-2 rounded-xl border border-emerald-100">
+                            <span class="text-sm text-emerald-900 flex items-center">کل قابلِ ادائیگی رقم:</span>
+                            <span class="font-mono text-emerald-700 text-lg">روپے <span id="grandtotal-val">0.00</span></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- رسید ایکشن بٹنز -->
-                <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-2 no-print">
-                    <button onclick="saveCurrentBill()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition shadow-sm">
-                        <i data-lucide="save" class="w-4 h-4"></i>
+                <!-- رسید ایکشن بٹنز (ملٹی کلرڈ ڈیزائن) -->
+                <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button onclick="saveCurrentBill()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                        <i data-lucide="save" class="w-3.5 h-3.5"></i>
                         بل سیو کریں
                     </button>
-                    <button onclick="downloadBillAsImage()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition shadow-sm">
-                        <i data-lucide="image" class="w-4 h-4"></i>
+                    <button onclick="downloadBillAsImage()" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                        <i data-lucide="image" class="w-3.5 h-3.5"></i>
                         تصویر ڈاؤن لوڈ 🖼️
                     </button>
-                    <button onclick="printBill()" class="bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 px-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition shadow-sm">
-                        <i data-lucide="printer" class="w-4 h-4"></i>
-                        پرنٹ / PDF
+                    <button onclick="printBill()" class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                        پرنٹ / PDF لیں
                     </button>
-                    <button onclick="resetBill()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2 px-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition">
-                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    <button onclick="resetBill()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                         نیا بل بنائیں
                     </button>
                 </div>
             </div>
 
             <!-- محفوظ شدہ بلوں کا ریکارڈ -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2 mb-4 pb-2 border-b border-b-slate-100">
-                    <i data-lucide="history" class="w-5 h-5 text-slate-600"></i>
+            <div class="bg-white rounded-2xl shadow-md border-t-4 border-slate-400 p-4">
+                <h3 class="font-bold text-base text-slate-700 flex items-center gap-1.5 mb-3 pb-1.5 border-b border-slate-100">
+                    <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
                     محفوظ شدہ پرانے بلوں کا ریکارڈ
                 </h3>
-                <div id="saved-bills-list" class="space-y-3 max-h-[200px] overflow-y-auto pr-1 text-base">
-                    <div class="text-center py-6 text-slate-400">
+                <div id="saved-bills-list" class="space-y-2 max-h-[160px] overflow-y-auto pr-0.5 text-xs">
+                    <div class="text-center py-4 text-slate-400">
                         ابھی تک کوئی پرانا بل محفوظ نہیں کیا گیا۔
                     </div>
                 </div>
@@ -329,37 +350,78 @@
         </div>
     </main>
 
+    <!-- 📥 خصوصی خفیہ پرنٹ ایریا (کبھی خالی نہیں آئے گا) -->
+    <div id="perfect-print-area">
+        <div style="text-align: center; border-bottom: 2px dashed #000000; padding-bottom: 12px; margin-bottom: 15px;">
+            <h2 style="font-size: 24px; font-weight: bold; margin: 0;">حساب کتاب کی فائنل رسید</h2>
+            <p style="font-size: 12px; margin: 3px 0 0 0; color: #555; tracking: 1px;">DIGITAL BILLING SYSTEM</p>
+            <table style="width: 100%; font-size: 12px; margin-top: 10px; text-align: right;">
+                <tr>
+                    <td><b>بل نمبر:</b> <span id="print-bill-id">--</span></td>
+                    <td style="text-align: left;"><b>تاریخ:</b> <span id="print-bill-date">--</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 14px;">
+            <thead>
+                <tr style="border-bottom: 1px solid #000000; color: #333;">
+                    <th style="padding-bottom: 6px; font-weight: bold; font-size: 15px;">آئٹم کا نام</th>
+                    <th style="padding-bottom: 6px; text-align: left; font-weight: bold; font-size: 15px;">تفصیلِ حساب (تعداد × قیمت = کل رقم)</th>
+                </tr>
+            </thead>
+            <tbody id="print-bill-items-body"></tbody>
+        </table>
+
+        <div style="border-top: 2px dashed #000000; margin-top: 15px; padding-top: 10px; font-size: 14px; line-height: 1.8;">
+            <div style="display: flex; justify-content: space-between;">
+                <span>ٹوٹل رقم (Subtotal):</span>
+                <span>روپے <span id="print-subtotal-val">0.00</span></span>
+            </div>
+            <div id="real-print-discount-row" style="display: flex; justify-content: space-between;">
+                <span>رعایت (<span id="real-print-discount-pct">0</span>%):</span>
+                <span>- روپے <span id="real-print-discount-val">0.00</span></span>
+            </div>
+            <div id="real-print-tax-row" style="display: flex; justify-content: space-between;">
+                <span>ٹیکس (<span id="real-print-tax-pct">0</span>%):</span>
+                <span>+ روپے <span id="real-print-tax-val">0.00</span></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; border-top: 1px solid #000; margin-top: 8px; padding-top: 8px;">
+                <span>کل قابلِ ادائیگی رقم:</span>
+                <span>روپے <span id="print-grandtotal-val">0.00</span></span>
+            </div>
+        </div>
+        <p style="text-align: center; font-size: 11px; margin-top: 30px; color: #666; border-top: 1px solid #eee; padding-top: 8px;">بلنگ اور سمارٹ کیلکولیٹر ٹول کے ذریعے تیار کردہ۔</p>
+    </div>
+
     <!-- کسٹم نوٹیفکیشن الرٹ بکس -->
-    <div id="toast-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 transition-all duration-300 z-[9999] pointer-events-none no-print border border-slate-700/50 max-w-sm sm:max-w-md w-[90%] -translate-y-20 opacity-0">
-        <span id="toast-icon-container" class="p-1.5 rounded-full bg-emerald-500 text-slate-950 shrink-0">
-            <i data-lucide="check" class="w-4 h-4"></i>
+    <div id="toast-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 transition-all duration-300 z-[9999] pointer-events-none no-print border border-slate-700/50 max-w-sm w-[90%] -translate-y-20 opacity-0">
+        <span id="toast-icon-container" class="p-1 rounded-full bg-emerald-500 text-slate-950 shrink-0">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
         </span>
-        <span id="toast-text" class="text-base font-semibold leading-relaxed text-right flex-grow">پیغام یہاں ہوگا</span>
+        <span id="toast-text" class="text-xs md:text-sm font-semibold leading-relaxed text-right flex-grow">پیغام یہاں ہوگا</span>
     </div>
 
     <!-- فوٹر -->
-    <footer class="mt-auto py-6 text-center text-sm text-slate-400 border-t border-slate-200 no-print">
+    <footer class="mt-auto py-4 text-center text-2xs text-slate-400 border-t border-slate-200/60 no-print">
         <p>ڈجیٹل بلنگ اور سمارٹ کیلکولیٹر ٹول © ۲۰۲۶۔ تمام حقوق محفوظ ہیں۔</p>
     </footer>
 
     <!-- جاوا اسکرپٹ کوڈ لاجک -->
     <script>
+        // لائیو تاریخ ترتیب دینا
         document.getElementById('live-date').innerText = new Date().toLocaleDateString('ur-PK', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
 
         let ledgerItems = [];
-        let currentBill = {
-            id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0
-        };
+        let currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0 };
         let savedBills = [];
         let calcInput = "0";
         let isNewInput = true;
         let toastTimeout = null;
 
-        function generateBillId() {
-            return 'BILL-' + Math.floor(100000 + Math.random() * 900000);
-        }
+        function generateBillId() { return 'BILL-' + Math.floor(100000 + Math.random() * 900000); }
 
         window.onload = function() {
             lucide.createIcons();
@@ -373,11 +435,11 @@
             const iconContainer = document.getElementById('toast-icon-container');
             toastText.innerText = message;
             if (type === 'success') {
-                iconContainer.className = "p-1.5 rounded-full bg-emerald-500 text-slate-950 shrink-0";
-                iconContainer.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+                iconContainer.className = "p-1 rounded-full bg-emerald-500 text-slate-950 shrink-0";
+                iconContainer.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i>';
             } else {
-                iconContainer.className = "p-1.5 rounded-full bg-red-500 text-white shrink-0";
-                iconContainer.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i>';
+                iconContainer.className = "p-1 rounded-full bg-red-500 text-white shrink-0";
+                iconContainer.innerHTML = '<i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>';
             }
             lucide.createIcons();
             if (toastTimeout) clearTimeout(toastTimeout);
@@ -425,7 +487,6 @@
             } catch (e) { return null; }
         }
 
-        // --- ڈراپ ڈاؤن لسٹ مینجمنٹ ---
         function handleItemSelectChange() {
             const select = document.getElementById('item-select');
             const customContainer = document.getElementById('custom-name-container');
@@ -473,7 +534,8 @@
             updateLedgerUI();
             animateAddButton();
 
-            showNotification(`🎉 ${finalItemName} (${qty} × ${price} = ${total} روپے) فہرست میں شامل ہو گیا!`, "success");
+            const calculationString = `${qty} × ${price} = ${total} روپے`;
+            showNotification(`🎉 ${finalItemName} (${calculationString}) فہرست میں شامل ہو گیا!`, "success");
             calcInput = "0"; isNewInput = true; calcHistoryDiv.innerText = ""; updateCalcDisplay();
             if (select.value === 'custom') document.getElementById('custom-item-name').value = "";
         }
@@ -487,7 +549,7 @@
             setTimeout(() => {
                 btn.classList.remove('bg-emerald-500');
                 btn.classList.add('bg-teal-600', 'hover:bg-teal-700');
-                btnText.innerText = "فهرست میں شامل کریں";
+                btnText.innerText = "فہرست میں شامل کریں";
             }, 1200);
         }
 
@@ -510,21 +572,19 @@
             ledgerItems.forEach((item, index) => {
                 runningTotal += item.total;
                 const row = document.createElement('div');
-                row.className = "flex flex-col gap-1.5 bg-slate-50 border border-slate-200 p-3 rounded-xl transition hover:border-teal-400 text-base";
+                row.className = "flex flex-col gap-1 bg-gradient-to-l from-slate-50 to-indigo-50/40 border border-slate-200 p-2 rounded-xl transition hover:border-purple-300 shadow-2xs";
                 row.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold text-slate-400 w-5 text-center">${index + 1}</span>
-                        <input type="text" value="${item.name}" onchange="updateLedgerItemName(${item.id}, this.value)" class="flex-grow bg-white border border-slate-200 rounded px-2.5 py-0.5 text-base focus:outline-none focus:ring-1 focus:ring-teal-500 font-medium">
-                        <button onclick="removeLedgerItem(${item.id})" class="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded-lg transition">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xs font-bold text-slate-400 w-4 text-center">${index + 1}</span>
+                        <input type="text" value="${item.name}" onchange="updateLedgerItemName(${item.id}, this.value)" class="flex-grow bg-white border border-slate-200 rounded px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium">
+                        <button onclick="removeLedgerItem(${item.id})" class="text-rose-500 hover:text-rose-700 p-1 hover:bg-rose-50 rounded-lg transition"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
                     </div>
-                    <div class="flex justify-between items-center pr-8 text-sm text-slate-500">
-                        <div class="flex gap-2">
-                            <span>تعداد: <input type="number" min="1" value="${item.qty}" onchange="updateLedgerItemQty(${item.id}, this.value)" class="w-12 px-1 border border-slate-200 rounded text-center font-mono"></span>
-                            <span>قیمت: <input type="number" value="${item.price}" onchange="updateLedgerItemPrice(${item.id}, this.value)" class="w-20 px-1 border border-slate-200 rounded text-center font-mono"></span>
+                    <div class="flex justify-between items-center pr-6 text-2xs text-slate-500">
+                        <div class="flex gap-1.5">
+                            <span>تعداد: <input type="number" min="1" value="${item.qty}" onchange="updateLedgerItemQty(${item.id}, this.value)" class="w-9 px-0.5 border border-slate-200 rounded text-center font-mono"></span>
+                            <span>قیمت: <input type="number" value="${item.price}" onchange="updateLedgerItemPrice(${item.id}, this.value)" class="w-16 px-0.5 border border-slate-200 rounded text-center font-mono"></span>
                         </div>
-                        <span class="font-mono font-bold text-teal-700 text-base bg-teal-50 px-2.5 py-0.5 rounded-md">${item.qty} × ${item.price} = ${item.total} روپے</span>
+                        <span class="font-mono font-bold text-purple-700 text-xs bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100/60">${item.qty} × ${item.price} = ${item.total} روپے</span>
                     </div>
                 `;
                 container.appendChild(row);
@@ -533,19 +593,10 @@
             lucide.createIcons();
         }
 
-        function updateLedgerItemName(id, newName) {
-            const item = ledgerItems.find(i => i.id === id);
-            if (item && newName.trim() !== "") item.name = newName.trim();
-        }
-        function updateLedgerItemQty(id, newQty) {
-            const item = ledgerItems.find(i => i.id === id); const qtyVal = parseInt(newQty);
-            if (item && !isNaN(qtyVal) && qtyVal > 0) { item.qty = qtyVal; item.total = item.qty * item.price; updateLedgerUI(); }
-        }
-        function updateLedgerItemPrice(id, newPrice) {
-            const item = ledgerItems.find(i => i.id === id); const priceVal = parseFloat(newPrice);
-            if (item && !isNaN(priceVal) && priceVal >= 0) { item.price = priceVal; item.total = item.qty * item.price; updateLedgerUI(); }
-        }
-        function removeLedgerItem(id) { ledgerItems = ledgerItems.filter(item => item.id !== id); updateLedgerUI(); showNotification("رقم فہرست سے حذف کر دی گئی ہے۔", "success"); }
+        function updateLedgerItemName(id, newName) { const item = ledgerItems.find(i => i.id === id); if (item && newName.trim() !== "") item.name = newName.trim(); }
+        function updateLedgerItemQty(id, newQty) { const item = ledgerItems.find(i => i.id === id); const qtyVal = parseInt(newQty); if (item && !isNaN(qtyVal) && qtyVal > 0) { item.qty = qtyVal; item.total = item.qty * item.price; updateLedgerUI(); calculateTotals(); } }
+        function updateLedgerItemPrice(id, newPrice) { const item = ledgerItems.find(i => i.id === id); const priceVal = parseFloat(newPrice); if (item && !isNaN(priceVal) && priceVal >= 0) { item.price = priceVal; item.total = item.qty * item.price; updateLedgerUI(); calculateTotals(); } }
+        function removeLedgerItem(id) { ledgerItems = ledgerItems.filter(item => item.id !== id); updateLedgerUI(); calculateTotals(); showNotification("رقم فہرست سے حذف کر دی گئی ہے۔", "success"); }
 
         // --- فائنل بل میکر ---
         function generateBillFromLedger() {
@@ -571,15 +622,24 @@
 
             document.getElementById('subtotal-val').innerText = subtotal.toFixed(2);
             document.getElementById('grandtotal-val').innerText = grandTotal.toFixed(2);
-
             document.getElementById('print-discount-pct').innerText = discountPct;
             document.getElementById('print-discount-val').innerText = discountVal.toFixed(2);
             document.getElementById('print-tax-pct').innerText = taxPct;
             document.getElementById('print-tax-val').innerText = taxVal.toFixed(2);
-
-            // زیرو ویلیوز کو تصویر/پرنٹ پر چھپانا یا دکھانا
             document.getElementById('print-discount-row').style.display = discountPct > 0 ? 'flex' : 'none';
             document.getElementById('print-tax-row').style.display = taxPct > 0 ? 'flex' : 'none';
+
+            // پرنٹ ڈیٹا اپڈیٹ
+            document.getElementById('print-bill-id').innerText = currentBill.id;
+            document.getElementById('print-bill-date').innerText = currentBill.date;
+            document.getElementById('print-subtotal-val').innerText = subtotal.toFixed(2);
+            document.getElementById('print-grandtotal-val').innerText = grandTotal.toFixed(2);
+            document.getElementById('real-print-discount-pct').innerText = discountPct;
+            document.getElementById('real-print-discount-val').innerText = discountVal.toFixed(2);
+            document.getElementById('real-print-tax-pct').innerText = taxPct;
+            document.getElementById('real-print-tax-val').innerText = taxVal.toFixed(2);
+            document.getElementById('real-print-discount-row').style.display = discountPct > 0 ? 'flex' : 'none';
+            document.getElementById('real-print-tax-row').style.display = taxPct > 0 ? 'flex' : 'none';
 
             updateBillUIDisplay();
         }
@@ -588,50 +648,43 @@
             document.getElementById('bill-id-display').innerText = currentBill.id;
             document.getElementById('bill-date-display').innerText = currentBill.date;
             const tbody = document.getElementById('bill-items-body');
+            const printTbody = document.getElementById('print-bill-items-body');
             const emptyState = document.getElementById('empty-state');
+            
             tbody.innerHTML = "";
+            printTbody.innerHTML = "";
 
             if (currentBill.items.length === 0) { emptyState.classList.remove('hidden'); } 
             else {
                 emptyState.classList.add('hidden');
                 currentBill.items.forEach(item => {
+                    const calculationString = `${item.qty} × ${item.price} = ${item.total} روپے`;
+                    
                     const row = document.createElement('tr');
-                    row.className = "hover:bg-slate-50 border-b border-slate-100 transition duration-150 text-base";
-                    row.innerHTML = `
-                        <td class="py-2.5 text-slate-800 font-medium">${item.name}</td>
-                        <td class="py-2.5 text-left font-mono font-bold text-teal-800">${item.qty} × ${item.price} = ${item.total} روپے</td>
-                    `;
+                    row.className = "hover:bg-slate-50 border-b border-slate-100 transition duration-150 text-xs";
+                    row.innerHTML = `<td class="py-2 text-slate-800 font-medium">${item.name}</td><td class="py-2 text-left font-mono font-bold text-pink-700">${calculationString}</td>`;
                     tbody.appendChild(row);
+
+                    const printRow = document.createElement('tr');
+                    printRow.style.borderBottom = "1px solid #eeeeee";
+                    printRow.innerHTML = `<td style="padding: 8px 0; font-size: 14px;">${item.name}</td><td style="padding: 8px 0; text-align: left; font-family: monospace; font-weight: bold;">${calculationString}</td>`;
+                    printTbody.appendChild(printRow);
                 });
             }
             lucide.createIcons();
         }
 
-        // --- تصویر ڈاؤن لوڈ کرنے کا فنکشن ---
         function downloadBillAsImage() {
-            if (currentBill.items.length === 0) {
-                showNotification("تصویر ڈاؤن لوڈ کرنے کے لیے پہلے فائنل بل بنانا لازمی ہے!", "error");
-                return;
-            }
-
+            if (currentBill.items.length === 0) { showNotification("تصویر ڈاؤن لوڈ کرنے کے لیے پہلے فائنل بل بنانا لازمی ہے!", "error"); return; }
             showNotification("تصویر تیار کی جا رہی ہے، براہ کرم ایک سیکنڈ انتظار کریں...", "success");
-            const receiptElement = document.getElementById('printable-receipt');
-            const options = {
-                scale: 2,
-                backgroundColor: "#ffffff",
-                useCORS: true
-            };
-
-            html2canvas(receiptElement, options).then(canvas => {
+            const receiptElement = document.getElementById('screen-receipt-view');
+            html2canvas(receiptElement, { scale: 2, backgroundColor: "#ffffff", useCORS: true }).then(canvas => {
                 const image = canvas.toDataURL("image/png");
                 const link = document.createElement('a');
                 link.download = `${currentBill.id}_رسید.png`;
-                link.href = image;
-                link.click();
+                link.href = image; link.click();
                 showNotification("🖼️ بل کی تصویر کامیابی سے ڈاؤن لوڈ ہو گئی ہے!");
-            }).catch(err => {
-                showNotification("تصویر بنانے میں کوئی مسئلہ پیش آیا ہے!", "error");
-            });
+            }).catch(err => { showNotification("تصویر بنانے میں کوئی مسئلہ پیش آیا ہے!", "error"); });
         }
 
         function resetBill() {
@@ -657,27 +710,31 @@
         function renderSavedBillsList() {
             const listContainer = document.getElementById('saved-bills-list');
             listContainer.innerHTML = "";
-            if (savedBills.length === 0) { listContainer.innerHTML = `<div class="text-center py-6 text-slate-400">ابھی تک کوئی پرانا بل محفوظ نہیں کیا گیا۔</div>`; return; }
+            if (savedBills.length === 0) { listContainer.innerHTML = `<div class="text-center py-4 text-slate-400">ابھی تک کوئی پرانا بل محفوظ نہیں کیا گیا۔</div>`; return; }
             savedBills.forEach(bill => {
                 const card = document.createElement('div');
-                card.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-emerald-500 transition duration-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-base";
+                card.className = "p-2 bg-slate-50 border border-slate-200 rounded-xl hover:border-indigo-400 transition duration-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs";
                 card.innerHTML = `
                     <div onclick="loadSavedBill('${bill.id}')" class="cursor-pointer flex-grow space-y-0.5 w-full text-right">
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-slate-800">${bill.id}</span>
-                            <span class="text-emerald-700 font-bold font-mono">روپے ${bill.grandTotal.toFixed(2)}</span>
+                            <span class="text-indigo-700 font-bold font-mono">روپے ${bill.grandTotal.toFixed(2)}</span>
                         </div>
-                        <div class="flex justify-between text-sm text-slate-400"><span>تاریخ: ${bill.date.split(',')[0]}</span><span>کل آئٹمز: ${bill.items.length}</span></div>
+                        <div class="flex justify-between text-2xs text-slate-400"><span>تاریخ: ${bill.date.split(',')[0]}</span><span>آئٹمز: ${bill.items.length}</span></div>
                     </div>
-                    <div class="flex gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200/60">
-                        <button onclick="loadSavedBill('${bill.id}')" class="p-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-600 transition flex items-center gap-1 text-sm px-2.5"><i data-lucide="eye" class="w-3.5 h-3.5"></i> ریکارڈ دیکھیں</button>
-                        <button onclick="deleteSavedBill('${bill.id}', event)" class="p-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    <div class="flex gap-1.5 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-1.5 sm:pt-0 border-slate-200/60">
+                        <button onclick="loadSavedBill('${bill.id}')" class="p-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition flex items-center gap-1 text-2xs px-2"><i data-lucide="eye" class="w-3 h-3"></i> دیکھیں</button>
+                        <button onclick="deleteSavedBill('${bill.id}', event)" class="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                     </div>
                 `;
                 listContainer.appendChild(card);
             });
             lucide.createIcons();
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadSavedBillsFromLocalStorage();
+        });
 
         function loadSavedBill(billId) {
             const bill = savedBills.find(b => b.id === billId);
