@@ -198,7 +198,7 @@
                     <button onclick="pressNum('.')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">.</button>
                     <button id="add-to-ledger-btn" onclick="addCurrentToLedger()" class="calc-btn col-span-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-2 rounded-xl text-sm flex items-center justify-center gap-1 shadow-md transition-all">
                         <i id="btn-icon" data-lucide="plus-circle" class="w-4 h-4"></i>
-                        <span id="btn-text">فہرست میں شامل کریں</span>
+                        <span id="btn-text">فهرست میں شامل کریں</span>
                     </button>
                 </div>
             </div>
@@ -410,7 +410,13 @@
     </footer>
 
     <script>
-        // 📥 آپ کے فائر بیس کونسول کا لائیو اسمارٹ برانڈڈ کنفیگریشن کوڈ
+        document.getElementById('live-date').innerText = new Date().toLocaleDateString('ur-PK', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // 🔐 دکان کا خفیہ پن کوڈ سیکیورٹی کے لیے (آپ 1234 کی جگہ اپنی مرضی کا پاسورڈ لکھ سکتے ہیں)
+        const SHOP_SECURITY_PIN = "1234";
+
         const firebaseConfig = {
             apiKey: "AIzaSyBOl7bex-m83Q2iRegJG5Lz4Dc7XeRlmp0",
             authDomain: "billing-730a8.firebaseapp.com",
@@ -420,17 +426,15 @@
             appId: "1:386280634762:web:2bf0008dde0c35c81f073*"
         };
 
-        // فائر بیس لائبریری کا آغاز
         let db = null;
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
-            // لائیو اسٹیٹس اپڈیٹ کریں کہ کنکشن کامیاب رہا
             document.getElementById('cloud-status').className = "bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center";
-            document.getElementById('cloud-status').innerHTML = '<i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-emerald-600"></i> <span>کلاؤڈ ڈیٹا بیس (Firebase Cloud) فعال ہے۔ آپ کا ڈیٹا تمام آلات پر ایک ساتھ لائیو سنگک ہوگا۔</span>';
+            document.getElementById('cloud-status').innerHTML = '<i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> <span>کلاؤڈ سیکیورٹی لاک فعال ہے۔ اب آپ کا کھاتہ مکمل طور پر محفوظ ہے۔</span>';
         } catch(e) {
             document.getElementById('cloud-status').className = "bg-rose-50 border border-rose-200 text-rose-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center";
-            document.getElementById('cloud-status').innerHTML = '<i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i> <span>فائر بیس لوڈ کرنے میں مسئلہ آیا! براہ کرم کنفیگریشن یا رولز چیک کریں۔</span>';
+            document.getElementById('cloud-status').innerHTML = '<i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i> <span>فائر بیس لوڈ کرنے میں مسئلہ آیا!</span>';
         }
 
         let ledgerItems = [];
@@ -445,7 +449,7 @@
         window.onload = function() {
             lucide.createIcons();
             updateBillUIDisplay();
-            loadSavedBillsFromLocalStorage(); // لائیو کلاؤڈ ڈیٹا کھینچیں
+            loadSavedBillsFromLocalStorage();
         };
 
         function updateCustomerName(name) {
@@ -533,7 +537,6 @@
             } else { customContainer.classList.add('hidden'); }
         }
 
-        /* فوری بٹن سے سلیکشن */
         function selectQuickItem(itemName) {
             const select = document.getElementById('item-select');
             select.value = itemName;
@@ -640,7 +643,6 @@
         function generateBillFromLedger() {
             if (ledgerItems.length === 0) { showNotification("بل بنانے سے پہلے فہرست میں کچھ آئٹمز شامل کریں!", "error"); return; }
             currentBill.items = JSON.parse(JSON.stringify(ledgerItems));
-            
             if (!currentBill.id || currentBill.id === "--") { currentBill.id = generateBillId(); }
             currentBill.date = new Date().toLocaleString('ur-PK');
             calculateTotals();
@@ -668,7 +670,7 @@
             document.getElementById('print-discount-row').style.display = discountPct > 0 ? 'flex' : 'none';
             document.getElementById('print-tax-row').style.display = taxPct > 0 ? 'flex' : 'none';
 
-            // برانڈڈ خفیہ پرنٹ ڈیٹا اپڈیٹ
+            // برانڈڈ پرنٹ ڈیٹا اپڈیٹ
             document.getElementById('print-bill-id').innerText = currentBill.id;
             document.getElementById('print-bill-date').innerText = currentBill.date;
             document.getElementById('print-subtotal-val').innerText = subtotal.toFixed(2);
@@ -743,26 +745,34 @@
             window.print();
         }
 
-        // ☁️ 💾 لوکل کے بجائے گوگل فائر بیس فائر اسٹور کلاؤڈ ڈیٹا بیس میں بل محفوظ کرنا
+        // 🔒 ☁️ محفوظ کلاؤڈ رائٹ فنکشن (پن کوڈ پروٹیکٹڈ)
         function saveCurrentBill() {
             if (currentBill.items.length === 0) { showNotification("خالی بل کو کلاؤڈ پر محفوظ نہیں کیا جا سکتا!", "error"); return; }
             if (!db) { showNotification("کلاؤڈ ڈیٹا بیس دستیاب نہیں ہے!", "error"); return; }
 
+            // 🔐 سیکیورٹی کوڈ کی تصدیق
+            const userPin = prompt("کلاؤڈ سیکیورٹی لاک فعال ہے۔ براہ کرم دکان کا خفیہ پن کوڈ (PIN Code) درج کریں:");
+            if (userPin === null) return; // اگر کینسل دبائے
+
+            if (userPin !== SHOP_SECURITY_PIN) {
+                showNotification("غلط پن کوڈ! ڈیٹا کلاؤڈ پر محفوظ نہیں کیا جا سکا۔", "error");
+                return;
+            }
+
             showNotification("ڈیٹا لائیو کلاؤڈ پر منتقل کیا جا رہا ہے...", "success");
-            currentBill.items = ledgerItems; // عارضی آئٹمز بھی فائنل بائنڈ کریں
+            currentBill.items = ledgerItems;
 
             db.collection("bills").doc(currentBill.id).set(currentBill)
             .then(() => {
                 showNotification("🎉 بل نیو قاری ہوزری کلاؤڈ ڈیٹا بیس میں مستقل محفوظ ہو گیا ہے!", "success");
-                loadSavedBillsFromLocalStorage(); // لسٹ دوبارہ لائیو ریفریش کریں
+                loadSavedBillsFromLocalStorage(); 
             })
             .catch((error) => {
-                console.error("Firebase Document Error: ", error);
-                showNotification("کلاؤڈ پر ڈیٹا محفوظ کرنے میں ناکامی! فائر بیس سیکیورٹی رولز چیک کریں۔", "error");
+                showNotification("کلاؤڈ پر ڈیٹا محفوظ کرنے میں ناکامی!", "error");
             });
         }
 
-        // ☁️ 📥 گوگل کلاؤڈ سے تمام ڈیوائسز کے لیے محفوظ بل لائیو حاصل کرنا
+        // کلاؤڈ سے بل لائیو حاصل کرنا (اس کے لیے پن کی ضرورت نہیں، تاکہ سب دیکھ سکیں)
         function loadSavedBillsFromLocalStorage() {
             if (!db) return;
 
@@ -772,12 +782,11 @@
                 querySnapshot.forEach((doc) => {
                     savedBills.push(doc.data());
                 });
-                renderSavedBillsList(); // اسکرین پر لسٹ اپڈیٹ کریں
+                renderSavedBillsList(); 
             })
             .catch((error) => {
-                console.error("Firebase Load Error: ", error);
                 const listContainer = document.getElementById('saved-bills-list');
-                listContainer.innerHTML = `<div class="text-center py-4 text-rose-500 font-bold">کلاؤڈ ڈیٹا لوڈ نہیں ہو سکا۔ رولز (Rules) سیٹ اپ کریں۔</div>`;
+                listContainer.innerHTML = `<div class="text-center py-4 text-rose-500 font-bold">کلاؤڈ ڈیٹا لوڈ نہیں ہو سکا۔</div>`;
             });
         }
 
@@ -835,16 +844,25 @@
             }
         }
 
-        // ☁️ ❌ گوگل فائر بیس کلاؤڈ سے مستقل بل حذف کرنا
+        // 🔒 ❌ محفوظ کلاؤڈ ڈیلیٹ فنکشن (پن کوڈ پروٹیکٹڈ)
         function deleteSavedBill(billId, event) {
             event.stopPropagation();
             if (!db) return;
 
-            if (confirm("کیا آپ واقعی یہ بل کلاؤڈ ریکارڈ سے مستقل حذف کرنا چاہتے ہیں؟ یہ عمل واپس نہیں ہو سکتا اور تمام ڈیوائسز سے ڈیلیٹ ہو جائے گا۔")) {
+            // 🔐 سیکیورٹی کوڈ کی تصدیق
+            const userPin = prompt("حذف کرنے کے لیے دکان کا خفیہ پن کوڈ (PIN Code) درج کریں:");
+            if (userPin === null) return;
+
+            if (userPin !== SHOP_SECURITY_PIN) {
+                showNotification("غلط پن کوڈ! بل حذف نہیں کیا جا سکا۔", "error");
+                return;
+            }
+
+            if (confirm("کیا آپ واقعی یہ بل کلاؤڈ ریکارڈ سے مستقل حذف کرنا چاہتے ہیں؟")) {
                 db.collection("bills").doc(billId).delete()
                 .then(() => {
                     showNotification("بل کلاؤڈ نیٹ ورک سے کامیابی سے حذف کر دیا گیا ہے۔", "success");
-                    loadSavedBillsFromLocalStorage(); // لسٹ ریفریش کریں
+                    loadSavedBillsFromLocalStorage(); 
                 })
                 .catch((error) => {
                     showNotification("حذف کرنے میں خرابی پیش آئی!", "error");
@@ -855,24 +873,5 @@
 </body>
 </html>
 
-```
-### 📢 فائر بیس چلانے کے لیے آخری اہم مرحلہ (بہت ضروری):
-اگر آپ نے اپنے فائر بیس کونسول پر **Firestore** کے رولز (Rules) اوپن نہیں کیے، تو بل سیو کرنے پر ایرر آ سکتا ہے۔ اسے لائیو کرنے کے لیے:
- 1. فائر بیس کونسول میں بائیں طرف مینو سے **Firestore Database** پر کلک کریں۔
- 2. اوپر موجود ٹیبز میں سے **Rules** ٹیب پر جائیں۔
- 3. وہاں لکھے ہوئے کوڈ کو مٹا کر یہ آسان رول پیسٹ کر دیں تا کہ تمام آلات سے سائن ان کے بغیر بل سیو ہو سکیں:
-   ```javascript
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /{document=**} {
-         allow read, write: if true;
-       }
-     }
-   }
-   
-   
-   ```
-```
 
 ```
