@@ -5,10 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>حساب کتاب اور بلنگ کیلکولیٹر</title>
+    <!-- Tailwind CSS برائے ڈیزائننگ -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons برائے شبیہیں -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2canvas لائبریری برائے تصویر ڈاؤن لوڈ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
+    <!-- ☁️ فائر بیس کلاؤڈ کی مرکزی لائبریریز -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
@@ -99,6 +103,7 @@
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-pink-50 text-slate-800 min-h-screen flex flex-col pb-12">
 
+    <!-- ہیڈر -->
     <header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg py-3 px-4 no-print">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
             <div class="text-center md:text-right">
@@ -112,17 +117,21 @@
         </div>
     </header>
 
+    <!-- کلاؤڈ سیکیورٹی بار -->
     <div class="max-w-7xl mx-auto w-full px-4 mt-3 no-print">
-        <div id="cloud-status" class="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i>
-            <span>کلاؤڈ ڈیٹا بیس (Firebase) سے جڑ رہا ہے... براہ کرم انتظار کریں۔</span>
+        <div id="cloud-status" class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600 animate-pulse"></i>
+            <span>کلاؤڈ سیکیورٹی لاک فعال ہے۔ آپ کا کلاؤڈ ڈیٹا بیس محفوظ اور چالو ہے۔</span>
         </div>
     </div>
 
+    <!-- مرکزی کنٹینٹ گریڈ -->
     <main class="max-w-7xl mx-auto w-full px-4 mt-4 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 no-print">
         
+        <!-- بایاں کالم -->
         <div class="lg:col-span-5 flex flex-col gap-6">
             
+            <!-- 1. کیلکولیٹر کارڈ -->
             <div class="bg-white rounded-2xl shadow-md border-t-4 border-indigo-500 p-4 transition-all hover:shadow-lg">
                 <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
                     <h2 class="font-bold text-base text-indigo-700 flex items-center gap-1.5">
@@ -167,11 +176,13 @@
                     </div>
                 </div>
                 
+                <!-- کیلکولیٹر اسکرین -->
                 <div class="bg-slate-900 text-white p-3 rounded-xl mb-3 text-left font-mono relative shadow-inner border border-slate-800">
                     <div id="calc-history" class="text-slate-500 text-2xs min-h-[1.2rem] break-all"></div>
                     <div id="calc-screen" class="text-2xl font-bold tracking-wider truncate mt-0.5 text-emerald-400">0</div>
                 </div>
 
+                <!-- کیلکولیٹر کی بورڈ -->
                 <div class="grid grid-cols-4 gap-1.5">
                     <button onclick="clearCalc()" class="calc-btn col-span-2 bg-rose-100 text-rose-700 hover:bg-rose-600 hover:text-white font-bold py-1.5 rounded-xl text-center text-sm shadow-sm transition-all">صاف کریں (C)</button>
                     <button onclick="pressOperator('/')" class="calc-btn bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white font-bold py-1.5 rounded-xl text-sm text-center shadow-sm transition-all">÷</button>
@@ -198,11 +209,12 @@
                     <button onclick="pressNum('.')" class="calc-btn bg-slate-50 text-slate-800 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-xl text-sm text-center shadow-sm transition-all">.</button>
                     <button id="add-to-ledger-btn" onclick="addCurrentToLedger()" class="calc-btn col-span-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-2 rounded-xl text-sm flex items-center justify-center gap-1 shadow-md transition-all">
                         <i id="btn-icon" data-lucide="plus-circle" class="w-4 h-4"></i>
-                        <span id="btn-text">فهرست میں شامل کریں</span>
+                        <span id="btn-text">فہرست میں شامل کریں</span>
                     </button>
                 </div>
             </div>
 
+            <!-- 2. عارضی کچے حساب کی فہرست -->
             <div class="bg-white rounded-2xl shadow-md border-t-4 border-purple-500 p-4 flex-grow flex flex-col justify-between min-h-[280px]">
                 <div>
                     <div class="flex justify-between items-center mb-3 pb-1.5 border-b border-slate-100">
@@ -234,24 +246,30 @@
             </div>
         </div>
 
+        <!-- دایاں کالم -->
         <div class="lg:col-span-7 flex flex-col gap-6">
             
+            <!-- ڈیجیٹل رسید کارڈ -->
             <div id="receipt-card" class="bg-white rounded-2xl shadow-lg border-t-4 border-pink-500 p-4 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
                 
+                <!-- کسٹمر نام داخل کرنے کا سیکشن -->
                 <div class="bg-gradient-to-r from-pink-50 to-indigo-50/50 p-2.5 rounded-xl border border-pink-100/60 mb-2 no-print flex flex-col sm:flex-row items-center gap-2">
                     <label class="text-xs font-bold text-pink-700 flex items-center gap-1 shrink-0">
                         <i data-lucide="user" class="w-3.5 h-3.5"></i>
                         خریدار / کسٹمر کا نام لکھیں:
                     </label>
-                    <input type="text" id="customer-name-input" oninput="updateCustomerName(this.value)" placeholder="کسٹمر کا نام درج کریں..." class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 font-medium">
+                    <input type="text" id="customer-name-input" oninput="updateCustomerName(this.value)" placeholder="کسٹمر کا نام درج کریں..." class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 font-medium font-bold">
                 </div>
 
+                <!-- اسکرین پر نظر آنے والی فائنل رسید -->
                 <div id="screen-receipt-view" class="space-y-4 bg-gradient-to-b from-white to-slate-50/50 p-4 rounded-xl border border-slate-100">
+                    <!-- رسید کا برانڈڈ ہیڈر -->
                     <div class="text-center pb-3 border-b border-dashed border-slate-300">
                         <h2 class="heading-urdu text-2xl font-bold text-slate-900 tracking-wide">نیو قاری ہوزری سٹور</h2>
                         <p class="text-xs text-slate-600 font-medium">نزد مبارک مسجد قائد اعظم مارکیٹ فیصل آباد</p>
                         <p class="text-xs text-indigo-700 font-bold font-mono mt-0.5">موبائل نمبر : 03065378112</p>
                         
+                        <!-- کسٹمر کا لائیو نام ڈسپلے -->
                         <div id="customer-name-display-row" class="hidden mt-2 bg-indigo-50/60 text-indigo-950 text-xs px-3 py-1 rounded-md border border-indigo-100 font-bold text-right">
                             <span>محترم خریدار: </span> <span id="customer-name-label" class="text-pink-700">--</span>
                         </div>
@@ -266,6 +284,7 @@
                         </div>
                     </div>
 
+                    <!-- فائنل ٹیبل -->
                     <div class="overflow-x-auto min-h-[160px]">
                         <table class="w-full text-xs md:text-sm text-right">
                             <thead>
@@ -274,7 +293,7 @@
                                     <th class="pb-1.5 text-left font-bold text-slate-700">تفصیلِ حساب (تعداد × قیمت = کل رقم)</th>
                                 </tr>
                             </thead>
-                            <tbody id="bill-items-body" class="divide-y divide-slate-100 text-xs"></tbody>
+                            <tbody id="bill-items-body" class="divide-y divide-slate-100 text-xs font-bold"></tbody>
                         </table>
                         <div id="empty-state" class="text-center py-10 text-slate-400 text-xs">
                             <i data-lucide="receipt" class="w-10 h-10 mx-auto stroke-1 opacity-50 mb-1.5"></i>
@@ -282,39 +301,43 @@
                         </div>
                     </div>
 
+                    <!-- مجموعی رقم کا حساب کتاب (تبدیل شدہ حصہ) -->
                     <div class="border-t border-dashed border-slate-300 pt-3 space-y-1.5 text-xs">
                         <div class="flex justify-between text-slate-600">
-                            <span class="font-medium">ٹوٹل رقم (Subtotal):</span>
+                            <span class="font-bold">موجوہ بل رقم (Subtotal):</span>
                             <span class="font-mono font-bold text-slate-700">روپے <span id="subtotal-val">0.00</span></span>
                         </div>
                         
-                        <div class="grid grid-cols-2 items-center gap-4 py-1 bg-slate-100/50 p-2 rounded-xl border border-slate-200/40">
+                        <!-- وصول رقم اور سابقہ بقایا کی فیلڈز (روپے میں) -->
+                        <div class="grid grid-cols-2 items-center gap-4 py-1.5 bg-slate-100/50 p-2 rounded-xl border border-slate-200/40">
                             <div class="flex items-center gap-1.5">
-                                <label class="text-sm font-bold text-slate-600 shrink-0">رعایت (%)</label>
-                                <input type="number" id="discount-pct" min="0" max="100" value="0" oninput="calculateTotals()" class="w-12 px-1 py-0.5 border border-slate-200 rounded text-center font-mono focus:ring-1 focus:ring-pink-500 focus:outline-none">
+                                <label class="text-sm font-bold text-purple-700 shrink-0">سابقہ بقایا (+)</label>
+                                <input type="number" id="previous-balance" min="0" value="0" oninput="calculateTotals()" class="w-20 px-1.5 py-0.5 border border-purple-200 rounded text-center font-mono font-bold focus:ring-1 focus:ring-purple-500 focus:outline-none">
                             </div>
                             <div class="flex items-center gap-1.5 justify-end">
-                                <label class="text-sm font-bold text-slate-600 shrink-0">ٹیکس (%)</label>
-                                <input type="number" id="tax-pct" min="0" max="100" value="0" oninput="calculateTotals()" class="w-12 px-1 py-0.5 border border-slate-200 rounded text-center font-mono focus:ring-1 focus:ring-pink-500 focus:outline-none">
+                                <label class="text-sm font-bold text-rose-700 shrink-0">وصول رقم (-)</label>
+                                <input type="number" id="received-amount" min="0" value="0" oninput="calculateTotals()" class="w-20 px-1.5 py-0.5 border border-rose-200 rounded text-center font-mono font-bold focus:ring-1 focus:ring-rose-500 focus:outline-none">
                             </div>
                         </div>
 
-                        <div id="print-discount-row" class="flex justify-between text-slate-500 text-2xs">
-                            <span>رعایت (<span id="print-discount-pct">0</span>%):</span>
-                            <span class="font-mono text-rose-600">- روپے <span id="print-discount-val">0.00</span></span>
+                        <!-- لائیو رسید پر بریک ڈاؤن شو ہونا -->
+                        <div id="print-previous-balance-row" class="flex justify-between text-slate-600">
+                            <span class="font-bold">سابقہ بقایا:</span>
+                            <span class="font-mono text-purple-700 font-bold">+ روپے <span id="print-previous-balance-val">0.00</span></span>
                         </div>
-                        <div id="print-tax-row" class="flex justify-between text-slate-500 text-2xs">
-                            <span>ٹیکس (<span id="print-tax-pct">0</span>%):</span>
-                            <span class="font-mono text-emerald-600">+ روپے <span id="print-tax-val">0.00</span></span>
+                        <div id="print-received-amount-row" class="flex justify-between text-slate-600">
+                            <span class="font-bold">وصول رقم:</span>
+                            <span class="font-mono text-rose-600 font-bold">- روپے <span id="print-received-amount-val">0.00</span></span>
                         </div>
 
                         <div class="flex justify-between font-bold text-slate-800 pt-2 border-t border-slate-200 bg-emerald-50/50 p-2 rounded-xl border border-emerald-100">
-                            <span class="text-sm text-emerald-900 flex items-center">کل قابلِ ادائیگی رقم:</span>
+                            <span class="text-sm text-emerald-900 flex items-center font-bold">کل بقایا (باقی رقم):</span>
                             <span class="font-mono text-emerald-700 text-lg">روپے <span id="grandtotal-val">0.00</span></span>
                         </div>
                     </div>
                 </div>
 
+                <!-- رسید ایکشن بٹنز -->
                 <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button onclick="saveCurrentBill()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
                         <i data-lucide="cloud-lightning" class="w-3.5 h-3.5"></i>
@@ -335,10 +358,11 @@
                 </div>
             </div>
 
+            <!-- محفوظ شدہ بلوں کا مستقل کلاؤڈ ریکارڈ ہسٹری -->
             <div class="bg-white rounded-2xl shadow-md border-t-4 border-slate-400 p-4">
                 <h3 class="font-bold text-base text-slate-700 flex items-center gap-1.5 mb-3 pb-1.5 border-b border-slate-100">
                     <i data-lucide="cloud-lightning" class="w-4 h-4 text-indigo-600"></i>
-                    محفوظ شدہ بلوں کا لائیو کلاؤڈ ریکارڈ (تمام ڈیوائسز کے لیے)
+                    محفوظ شدہ بلوں کا لائیو کلاؤڈ ریکارڈ (تمام آلات کے لیے)
                 </h3>
                 <div id="saved-bills-list" class="space-y-2 max-h-[180px] overflow-y-auto pr-0.5 text-xs">
                     <div class="text-center py-4 text-slate-400">
@@ -349,6 +373,7 @@
         </div>
     </main>
 
+    <!-- 📥 خصوصی خفیہ پرنٹ برانڈڈ ایریا (پرنٹ اور پی ڈی ایف کے لیے بہترین ترتیب) -->
     <div id="perfect-print-area">
         <div style="text-align: center; border-bottom: 2px dashed #000000; padding-bottom: 12px; margin-bottom: 15px;">
             <h2 style="font-size: 26px; font-weight: bold; margin: 0; padding: 0;">نیو قاری ہوزری سٹور</h2>
@@ -374,30 +399,31 @@
                     <th style="padding-bottom: 6px; text-align: left; font-weight: bold; font-size: 15px;">تفصیلِ حساب (تعداد × قیمت = کل رقم)</th>
                 </tr>
             </thead>
-            <tbody id="print-bill-items-body"></tbody>
+            <tbody id="print-bill-items-body" style="font-weight: bold;"></tbody>
         </table>
 
-        <div style="border-top: 2px dashed #000000; margin-top: 15px; padding-top: 10px; font-size: 14px; line-height: 1.8;">
+        <div style="border-top: 2px dashed #000000; margin-top: 15px; padding-top: 10px; font-size: 14px; line-height: 1.8; font-weight: bold;">
             <div style="display: flex; justify-content: space-between;">
-                <span>ٹوٹل رقم (Subtotal):</span>
+                <span>موجوہ بل رقم (Subtotal):</span>
                 <span>روپے <span id="print-subtotal-val">0.00</span></span>
             </div>
-            <div id="real-print-discount-row" style="display: flex; justify-content: space-between;">
-                <span>رعایت (<span id="real-print-discount-pct">0</span>%):</span>
-                <span>- روپے <span id="real-print-discount-val">0.00</span></span>
+            <div id="real-print-previous-balance-row" style="display: flex; justify-content: space-between;">
+                <span>سابقہ بقایا:</span>
+                <span>+ روپے <span id="real-print-previous-balance-val">0.00</span></span>
             </div>
-            <div id="real-print-tax-row" style="display: flex; justify-content: space-between;">
-                <span>ٹیکس (<span id="real-print-tax-pct">0</span>%):</span>
-                <span>+ روپے <span id="real-print-tax-val">0.00</span></span>
+            <div id="real-print-received-amount-row" style="display: flex; justify-content: space-between;">
+                <span>وصول رقم:</span>
+                <span>- روپے <span id="real-print-received-amount-val">0.00</span></span>
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; border-top: 1px solid #000; margin-top: 8px; padding-top: 8px;">
-                <span>کل قابلِ ادائیگی رقم:</span>
+                <span>کل بقایا (باقی رقم):</span>
                 <span>روپے <span id="print-grandtotal-val">0.00</span></span>
             </div>
         </div>
         <p style="text-align: center; font-size: 11px; margin-top: 30px; color: #555; border-top: 1px solid #eee; padding-top: 8px;">بلنگ اور سمارٹ کیلکولیٹر ٹول کے ذریعے تیار کردہ۔</p>
     </div>
 
+    <!-- کسٹم نوٹیفکیشن الرٹ بکس -->
     <div id="toast-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 transition-all duration-300 z-[9999] pointer-events-none no-print border border-slate-700/50 max-w-sm w-[90%] -translate-y-20 opacity-0">
         <span id="toast-icon-container" class="p-1 rounded-full bg-emerald-500 text-slate-950 shrink-0">
             <i data-lucide="check" class="w-3.5 h-3.5"></i>
@@ -405,16 +431,18 @@
         <span id="toast-text" class="text-xs md:text-sm font-semibold leading-relaxed text-right flex-grow">پیغام یہاں ہوگا</span>
     </div>
 
+    <!-- فوٹر -->
     <footer class="mt-auto py-4 text-center text-2xs text-slate-400 border-t border-slate-200/60 no-print">
         <p>ڈجیٹل بلنگ اور سمارٹ کیلکولیٹر ٹول © ۲۰۲۶۔ تمام حقوق محفوظ ہیں۔</p>
     </footer>
 
+    <!-- جاوا اسکرپٹ کوڈ لاجک -->
     <script>
         document.getElementById('live-date').innerText = new Date().toLocaleDateString('ur-PK', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        // 🔐 دکان کا خفیہ پن کوڈ سیکیورٹی کے لیے (آپ 1234 کی جگہ اپنی مرضی کا پاسورڈ لکھ سکتے ہیں)
+        // 🔐 دکان کا خفیہ پن کوڈ سیکیورٹی کے لیے
         const SHOP_SECURITY_PIN = "1234";
 
         const firebaseConfig = {
@@ -438,7 +466,16 @@
         }
 
         let ledgerItems = [];
-        let currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0, customerName: "" };
+        let currentBill = { 
+            id: generateBillId(), 
+            date: new Date().toLocaleString('ur-PK'), 
+            items: [], 
+            previousBalance: 0, 
+            receivedAmount: 0, 
+            subtotal: 0, 
+            grandTotal: 0, 
+            customerName: "" 
+        };
         let savedBills = [];
         let calcInput = "0";
         let isNewInput = true;
@@ -617,13 +654,13 @@
                 row.innerHTML = `
                     <div class="flex items-center gap-2">
                         <span class="text-2xs font-bold text-slate-400 w-4 text-center">${index + 1}</span>
-                        <input type="text" value="${item.name}" onchange="updateLedgerItemName(${item.id}, this.value)" class="flex-grow bg-white border border-slate-200 rounded px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium">
+                        <input type="text" value="${item.name}" onchange="updateLedgerItemName(${item.id}, this.value)" class="flex-grow bg-white border border-slate-200 rounded px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 font-bold">
                         <button onclick="removeLedgerItem(${item.id})" class="text-rose-500 hover:text-rose-700 p-1 hover:bg-rose-50 rounded-lg transition"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
                     </div>
                     <div class="flex justify-between items-center pr-6 text-2xs text-slate-500">
                         <div class="flex gap-1.5">
-                            <span>تعداد: <input type="number" min="1" value="${item.qty}" onchange="updateLedgerItemQty(${item.id}, this.value)" class="w-9 px-0.5 border border-slate-200 rounded text-center font-mono"></span>
-                            <span>قیمت: <input type="number" value="${item.price}" onchange="updateLedgerItemPrice(${item.id}, this.value)" class="w-16 px-0.5 border border-slate-200 rounded text-center font-mono"></span>
+                            <span>تعداد: <input type="number" min="1" value="${item.qty}" onchange="updateLedgerItemQty(${item.id}, this.value)" class="w-9 px-0.5 border border-slate-200 rounded text-center font-mono font-bold"></span>
+                            <span>قیمت: <input type="number" value="${item.price}" onchange="updateLedgerItemPrice(${item.id}, this.value)" class="w-16 px-0.5 border border-slate-200 rounded text-center font-mono font-bold"></span>
                         </div>
                         <span class="font-mono font-bold text-purple-700 text-xs bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100/60">${item.qty} × ${item.price} = ${item.total} روپے</span>
                     </div>
@@ -650,37 +687,46 @@
             document.getElementById('receipt-card').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // 💵 لائیو حساب کتاب برائے سابقہ بقایا اور وصول رقم
         function calculateTotals() {
             let subtotal = 0;
             currentBill.items.forEach(item => subtotal += item.total);
-            const discountPct = parseFloat(document.getElementById('discount-pct').value) || 0;
-            const taxPct = parseFloat(document.getElementById('tax-pct').value) || 0;
-            const discountVal = (subtotal * discountPct) / 100;
-            const taxVal = ((subtotal - discountVal) * taxPct) / 100;
-            const grandTotal = subtotal - discountVal + taxVal;
+            
+            const previousBalance = parseFloat(document.getElementById('previous-balance').value) || 0;
+            const receivedAmount = parseFloat(document.getElementById('received-amount').value) || 0;
+            
+            // مجموعی بقایا کا ریاضیاتی فارمولا
+            const grandTotal = (subtotal + previousBalance) - receivedAmount;
 
-            currentBill.subtotal = subtotal; currentBill.discount = discountPct; currentBill.tax = taxPct; currentBill.grandTotal = grandTotal;
+            currentBill.subtotal = subtotal; 
+            currentBill.previousBalance = previousBalance; 
+            currentBill.receivedAmount = receivedAmount; 
+            currentBill.grandTotal = grandTotal;
 
+            // اسکرین کے ٹوٹل اپڈیٹ کریں
             document.getElementById('subtotal-val').innerText = subtotal.toFixed(2);
             document.getElementById('grandtotal-val').innerText = grandTotal.toFixed(2);
-            document.getElementById('print-discount-pct').innerText = discountPct;
-            document.getElementById('print-discount-val').innerText = discountVal.toFixed(2);
-            document.getElementById('print-tax-pct').innerText = taxPct;
-            document.getElementById('print-tax-val').innerText = taxVal.toFixed(2);
-            document.getElementById('print-discount-row').style.display = discountPct > 0 ? 'flex' : 'none';
-            document.getElementById('print-tax-row').style.display = taxPct > 0 ? 'flex' : 'none';
+            
+            // ڈسپلے بریک ڈاؤن لائیو اپڈیٹ کریں
+            document.getElementById('print-previous-balance-pct').innerText = previousBalance.toFixed(0);
+            document.getElementById('print-previous-balance-val').innerText = previousBalance.toFixed(2);
+            document.getElementById('print-received-amount-pct').innerText = receivedAmount.toFixed(0);
+            document.getElementById('print-received-amount-val').innerText = receivedAmount.toFixed(2);
+            
+            document.getElementById('print-previous-balance-row').style.display = previousBalance > 0 ? 'flex' : 'none';
+            document.getElementById('print-received-amount-row').style.display = receivedAmount > 0 ? 'flex' : 'none';
 
-            // برانڈڈ پرنٹ ڈیٹا اپڈیٹ
+            // برانڈڈ خفیہ پرنٹ ڈیٹا اپڈیٹ کریں
             document.getElementById('print-bill-id').innerText = currentBill.id;
             document.getElementById('print-bill-date').innerText = currentBill.date;
             document.getElementById('print-subtotal-val').innerText = subtotal.toFixed(2);
             document.getElementById('print-grandtotal-val').innerText = grandTotal.toFixed(2);
-            document.getElementById('real-print-discount-pct').innerText = discountPct;
-            document.getElementById('real-print-discount-val').innerText = discountVal.toFixed(2);
-            document.getElementById('real-print-tax-pct').innerText = taxPct;
-            document.getElementById('real-print-tax-val').innerText = taxVal.toFixed(2);
-            document.getElementById('real-print-discount-row').style.display = discountPct > 0 ? 'flex' : 'none';
-            document.getElementById('real-print-tax-row').style.display = taxPct > 0 ? 'flex' : 'none';
+            
+            document.getElementById('real-print-previous-balance-val').innerText = previousBalance.toFixed(2);
+            document.getElementById('real-print-received-amount-val').innerText = receivedAmount.toFixed(2);
+            
+            document.getElementById('real-print-previous-balance-row').style.display = previousBalance > 0 ? 'flex' : 'none';
+            document.getElementById('real-print-received-amount-row').style.display = receivedAmount > 0 ? 'flex' : 'none';
 
             updateBillUIDisplay();
         }
@@ -703,7 +749,7 @@
                     
                     const row = document.createElement('tr');
                     row.className = "hover:bg-slate-50 border-b border-slate-100 transition duration-150 text-xs";
-                    row.innerHTML = `<td class="py-2 text-slate-800 font-medium">${item.name}</td><td class="py-2 text-left font-mono font-bold text-pink-700">${calculationString}</td>`;
+                    row.innerHTML = `<td class="py-2 text-slate-800 font-bold">${item.name}</td><td class="py-2 text-left font-mono font-bold text-pink-700">${calculationString}</td>`;
                     tbody.appendChild(row);
 
                     const printRow = document.createElement('tr');
@@ -729,10 +775,10 @@
         }
 
         function resetBill() {
-            currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0, customerName: "" };
+            currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], previousBalance: 0, receivedAmount: 0, subtotal: 0, grandTotal: 0, customerName: "" };
             ledgerItems = []; 
-            document.getElementById('discount-pct').value = 0; 
-            document.getElementById('tax-pct').value = 0;
+            document.getElementById('previous-balance').value = 0; 
+            document.getElementById('received-amount').value = 0;
             document.getElementById('customer-name-input').value = "";
             updateCustomerName("");
             updateLedgerUI(); 
@@ -745,14 +791,13 @@
             window.print();
         }
 
-        // 🔒 ☁️ محفوظ کلاؤڈ رائٹ فنکشن (پن کوڈ پروٹیکٹڈ)
+        // کلاؤڈ رائٹ فنکشن (پن کوڈ پروٹیکٹڈ)
         function saveCurrentBill() {
             if (currentBill.items.length === 0) { showNotification("خالی بل کو کلاؤڈ پر محفوظ نہیں کیا جا سکتا!", "error"); return; }
             if (!db) { showNotification("کلاؤڈ ڈیٹا بیس دستیاب نہیں ہے!", "error"); return; }
 
-            // 🔐 سیکیورٹی کوڈ کی تصدیق
             const userPin = prompt("کلاؤڈ سیکیورٹی لاک فعال ہے۔ براہ کرم دکان کا خفیہ پن کوڈ (PIN Code) درج کریں:");
-            if (userPin === null) return; // اگر کینسل دبائے
+            if (userPin === null) return; 
 
             if (userPin !== SHOP_SECURITY_PIN) {
                 showNotification("غلط پن کوڈ! ڈیٹا کلاؤڈ پر محفوظ نہیں کیا جا سکا۔", "error");
@@ -772,7 +817,7 @@
             });
         }
 
-        // کلاؤڈ سے بل لائیو حاصل کرنا (اس کے لیے پن کی ضرورت نہیں، تاکہ سب دیکھ سکیں)
+        // کلاؤڈ سے بل لائیو حاصل کرنا
         function loadSavedBillsFromLocalStorage() {
             if (!db) return;
 
@@ -831,8 +876,8 @@
                 currentBill = JSON.parse(JSON.stringify(bill));
                 ledgerItems = JSON.parse(JSON.stringify(bill.items || []));
                 
-                document.getElementById('discount-pct').value = currentBill.discount || 0; 
-                document.getElementById('tax-pct').value = currentBill.tax || 0;
+                document.getElementById('previous-balance').value = currentBill.previousBalance || 0; 
+                document.getElementById('received-amount').value = currentBill.receivedAmount || 0;
                 document.getElementById('customer-name-input').value = currentBill.customerName || "";
                 
                 updateCustomerName(currentBill.customerName || "");
@@ -844,12 +889,11 @@
             }
         }
 
-        // 🔒 ❌ محفوظ کلاؤڈ ڈیلیٹ فنکشن (پن کوڈ پروٹیکٹڈ)
+        // کلاؤڈ سے مستقل بل حذف کرنا
         function deleteSavedBill(billId, event) {
             event.stopPropagation();
             if (!db) return;
 
-            // 🔐 سیکیورٹی کوڈ کی تصدیق
             const userPin = prompt("حذف کرنے کے لیے دکان کا خفیہ پن کوڈ (PIN Code) درج کریں:");
             if (userPin === null) return;
 
@@ -872,6 +916,5 @@
     </script>
 </body>
 </html>
-
 
 ```
