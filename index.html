@@ -530,10 +530,6 @@
 
     <!-- جاوا اسکرپٹ کوڈ لاجک -->
     <script>
-        document.getElementById('live-date').innerText = new Date().toLocaleDateString('ur-PK', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-
         const SHOP_SECURITY_PIN = "1234";
 
         // 🔗 فائر بیس سیکیورٹی کنفیگریشن
@@ -546,7 +542,7 @@
             appId: "1:386280634762:web:2bf0008dde0c35c81f0739"
         };
 
-        // 📦 تمام آئٹمز اور ان کی مخصوص ورائٹیز کی مکمل فہرست (آپ کی ڈیمانڈ کے مطابق اپ ڈیٹ شدہ)
+        // 📦 تمام آئٹمز اور ان کی مخصوص ورائٹیز کی فہرست
         const itemVarieties = {
             "جراب": [
                 "مردانہ کاٹن",
@@ -586,7 +582,7 @@
                 "ولویٹ سیٹ",
                 "مردانہ چائنا",
                 "لیڈیز چمکی",
-                "لیڈیز چمکی فولڈ",
+                "لیڈیز چمکی fold",
                 "لیڈیز چائنا",
                 "بچکانہ چائنا",
                 "بچکانہ",
@@ -667,11 +663,21 @@
 
         function generateBillId() { return 'BILL-' + Math.floor(100000 + Math.random() * 900000); }
 
+        // محفوظ اور فول پروف لائف سائیکل انیشلائزیشن (Bug Fixed)
         window.onload = function() {
-            lucide.createIcons();
-            populateVarieties(); // صفحہ کھلتے ہی پہلی بار ورائٹیز لوڈ کریں
+            // لائیو تاریخ کا محفوظ بائنڈ
+            const liveDateEl = document.getElementById('live-date');
+            if (liveDateEl) {
+                liveDateEl.innerText = new Date().toLocaleDateString('ur-PK', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+            }
+
+            populateVarieties(); 
             updateBillUIDisplay();
             initFirebase();
+            setupKeyboardShortcuts();
+            updateCalcDisplay(); // پہلی بار اسکرین کو چالو کریں
         };
 
         // آئٹم تبدیل ہونے پر اس کی ورائٹیز خودکار لوڈ کرنے کا فنکشن
@@ -719,7 +725,7 @@
                 customContainer.classList.remove('hidden');
                 document.getElementById('custom-variety-name').placeholder = "یہاں نئی ورائٹی کا نام لکھیں...";
                 document.getElementById('custom-variety-name').classList.remove('hidden');
-                document.getElementById('custom-item-name').classList.add('hidden'); // بنیادی نام چھپا رہے گا کیونکہ وہ پہلے سے منتخب ہے
+                document.getElementById('custom-item-name').classList.add('hidden'); 
                 document.getElementById('custom-variety-name').focus();
             } else {
                 if (document.getElementById('item-select').value !== 'custom') {
@@ -769,27 +775,54 @@
             }, 3000);
         }
 
+        // --- اسمارٹ کیلکولیٹر اسکرین رینڈرنگ (محفوظ اور مستحکم طریقہ) ---
+        function updateCalcDisplay() {
+            const screen = document.getElementById('calc-screen');
+            if (screen) {
+                screen.innerText = calcInput;
+            }
+        }
+
         function pressNum(num) {
-            if (isNewInput || calcInput === "0") { calcInput = num; isNewInput = false; }
-            else { calcInput += num; }
+            if (isNewInput || calcInput === "0") { 
+                calcInput = num; 
+                isNewInput = false; 
+            } else { 
+                calcInput += num; 
+            }
             updateCalcDisplay();
         }
 
         function pressOperator(op) {
             let lastChar = calcInput.slice(-1);
-            if (['+', '-', '*', '/'].includes(lastChar)) { calcInput = calcInput.slice(0, -1) + op; }
-            else { calcInput += op; }
+            if (['+', '-', '*', '/'].includes(lastChar)) { 
+                calcInput = calcInput.slice(0, -1) + op; 
+            } else { 
+                calcInput += op; 
+            }
             isNewInput = false;
             updateCalcDisplay();
         }
 
-        function clearCalc() { calcInput = "0"; isNewInput = true; calcHistoryDiv.innerText = ""; updateCalcDisplay(); }
+        function clearCalc() { 
+            calcInput = "0"; 
+            isNewInput = true; 
+            const historyDiv = document.getElementById('calc-history');
+            if (historyDiv) {
+                historyDiv.innerText = ""; 
+            }
+            updateCalcDisplay(); 
+        }
+
         function deleteLast() {
-            if (calcInput.length > 1) { calcInput = calcInput.slice(0, -1); }
-            else { calcInput = "0"; isNewInput = true; }
+            if (calcInput.length > 1) { 
+                calcInput = calcInput.slice(0, -1); 
+            } else { 
+                calcInput = "0"; 
+                isNewInput = true; 
+            }
             updateCalcDisplay();
         }
-        function updateCalcDisplay() { calcScreen.innerText = calcInput; }
 
         function solveCalculation() {
             try {
@@ -853,7 +886,13 @@
 
             const calculationString = `${qty} × ${price} = ${total} روپے`;
             showNotification(`🎉 ${finalItemName} (${calculationString}) فہرست میں شامل ہو گیا!`, "success");
-            calcInput = "0"; isNewInput = true; calcHistoryDiv.innerText = ""; updateCalcDisplay();
+            
+            // کیلکولیٹر صاف کریں
+            calcInput = "0"; 
+            isNewInput = true; 
+            const historyDiv = document.getElementById('calc-history');
+            if (historyDiv) historyDiv.innerText = "";
+            updateCalcDisplay();
             
             // کسٹم ان پٹس صاف کرنا
             document.getElementById('custom-item-name').value = "";
@@ -1229,6 +1268,30 @@
                 })
                 .catch((error) => { showNotification("حذف کرنے میں خرابی پیش آئی!", "error"); });
             }
+        }
+
+        // کی بورڈ ان پٹ شارٹ کٹس
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+                    return; 
+                }
+                const key = e.key;
+                if (key >= '0' && key <= '9') {
+                    pressNum(key);
+                } else if (key === '.') {
+                    pressNum('.');
+                } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                    pressOperator(key);
+                } else if (key === 'Enter') {
+                    e.preventDefault();
+                    addCurrentToLedger();
+                } else if (key === 'Backspace') {
+                    deleteLast();
+                } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                    clearCalc();
+                }
+            });
         }
     </script>
 </body>
