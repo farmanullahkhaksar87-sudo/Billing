@@ -118,11 +118,13 @@
         </div>
     </header>
 
-    <!-- کلاؤڈ سیکیورٹی بار -->
+    <!-- کلاؤڈ سیکیورٹی بار اور لائیو ڈیبگر پینل -->
     <div class="max-w-7xl mx-auto w-full px-4 mt-3 no-print">
-        <div id="cloud-status" class="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-sans justify-center">
-            <i data-lucide="loader" class="w-3.5 h-3.5 text-amber-600 animate-spin"></i>
-            <span>کلاؤڈ سیکیورٹی لاک کی تصدیق کی جا رہی ہے...</span>
+        <div id="cloud-status" class="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-1.5 rounded-lg flex flex-col gap-1.5 font-sans justify-center text-center">
+            <div class="flex items-center gap-1.5 justify-center">
+                <i data-lucide="loader" class="w-3.5 h-3.5 text-amber-600 animate-spin"></i>
+                <span>کلاؤڈ سیکیورٹی لاک کی تصدیق کی جا رہی ہے...</span>
+            </div>
         </div>
     </div>
 
@@ -379,9 +381,9 @@
                         <i data-lucide="cloud-lightning" class="w-3.5 h-3.5"></i>
                         کلاؤڈ محفوظ
                     </button>
-                    <button onclick="shareOnWhatsApp()" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
-                        <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                        واٹس ایپ شیئر
+                    <button onclick="openShareModal()" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
+                        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+                        واٹس ایپ بھیجیں
                     </button>
                     <button onclick="downloadBillAsImage()" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
                         <i data-lucide="image" class="w-3.5 h-3.5"></i>
@@ -422,7 +424,7 @@
         </div>
     </main>
 
-    <!-- 📥 خصوصی خفیہ پرنٹ برانڈڈ ایریا (پرنٹ اور پی ڈی ایف کے لیے بہترین ترتیب) -->
+    <!-- 📤 خصوصی خفیہ پرنٹ برانڈڈ ایریا (پرنٹ اور پی ڈی ایف کے لیے بہترین ترتیب) -->
     <div id="perfect-print-area">
         <div style="text-align: center; border-bottom: 2px dashed #000000; padding-bottom: 12px; margin-bottom: 15px;">
             <h2 style="font-size: 26px; font-weight: bold; margin: 0; padding: 0;">نیو قاری ہوزری سٹور</h2>
@@ -472,6 +474,47 @@
         <p style="text-align: center; font-size: 11px; margin-top: 30px; color: #555; border-top: 1px solid #eee; padding-top: 8px;">بلنگ اور سمارٹ کیلکولیٹر ٹول کے ذریعے تیار کردہ۔</p>
     </div>
 
+    <!-- 🔗 جدید واٹس ایپ شیئر مینو پاپ اپ (Action Sheet Modal) -->
+    <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center z-[9999] opacity-0 pointer-events-none transition-all duration-300 no-print">
+        <div class="bg-white rounded-t-3xl sm:rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 transform translate-y-10 sm:translate-y-0 sm:scale-95 transition-all duration-300 text-right">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
+                <h3 class="font-bold text-base text-indigo-700 flex items-center gap-2">
+                    <i data-lucide="share-2" class="w-5 h-5 text-indigo-600"></i>
+                    بل واٹس ایپ پر بھیجیں
+                </h3>
+                <button onclick="closeShareModal()" class="text-slate-400 hover:text-slate-600 transition p-1 hover:bg-slate-50 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4 font-medium leading-relaxed">برائے مہربانی بل بھیجنے کا طریقہ منتخب کریں:</p>
+            <div class="space-y-3">
+                <!-- آپشن نمبر 1: واٹس ایپ ٹیکسٹ -->
+                <button onclick="shareOnWhatsAppText()" class="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/30 transition text-right">
+                    <div class="flex items-center gap-3">
+                        <span class="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="message-square" class="w-5 h-5"></i></span>
+                        <div>
+                            <h4 class="font-bold text-xs text-slate-800">میسج لکھائی کی شکل میں بھیجیں</h4>
+                            <p class="text-[10px] text-slate-400">بل کی مکمل تفصیلات لکھ کر واٹس ایپ پر جائیں گی</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-left" class="w-4 h-4 text-slate-400"></i>
+                </button>
+                
+                <!-- آپشن نمبر 2: واٹس ایپ خوبصورت تصویر -->
+                <button onclick="shareOnWhatsAppImage()" class="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/30 transition text-right">
+                    <div class="flex items-center gap-3">
+                        <span class="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="image" class="w-5 h-5"></i></span>
+                        <div>
+                            <h4 class="font-bold text-xs text-slate-800">خوبصورت رسید کی تصویر بھیجیں 🖼️</h4>
+                            <p class="text-[10px] text-slate-400">مکمل پرنٹ بل رسید واٹس ایپ پر تصویر بن کر جائے گی</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-left" class="w-4 h-4 text-slate-400"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- کسٹم نوٹیفکیشن الرٹ بکس -->
     <div id="toast-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 transition-all duration-300 z-[9999] pointer-events-none no-print border border-slate-700/50 max-w-sm w-[90%] -translate-y-20 opacity-0">
         <span id="toast-icon-container" class="p-1 rounded-full bg-emerald-500 text-slate-950 shrink-0">
@@ -504,39 +547,69 @@
                 projectId: "billing-730a8",
                 storageBucket: "billing-730a8.firebasestorage.app",
                 messagingSenderId: "386280634762",
-                appId: "1:386280634762:web:2bf0008dde0c35c81f073*"
+                appId: "1:386280634762:web:2bf0008dde0c35c81f0739" // درست ایپ آئی ڈی
             };
 
         let db = null;
         let auth = null;
         let billsCollection = null;
 
-        // کلاؤڈ نیٹ ورک کے محفوظ بائنڈز (Firebase Rules Guardrails)
+        // کلاؤڈ نیٹ ورک کے محفوظ بائنڈز (Firebase Live Debugger Panel)
         async function initFirebaseAndAuth() {
             try {
-                firebase.initializeApp(firebaseConfig);
+                // ڈوپلیکیٹ ایپ انیشلائزیشن بگ کو ٹھیک کرنے کے لیے چیک کریں
+                let app;
+                if (!firebase.apps.length) {
+                    app = firebase.initializeApp(firebaseConfig);
+                } else {
+                    app = firebase.app();
+                }
+                
                 auth = firebase.auth();
                 db = firebase.firestore();
                 
                 // کلاؤڈ پاتھ کا محفوظ تعین
                 billsCollection = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('bills');
 
-                // کلاؤڈ سیکیورٹی لاک
+                // کلاؤڈ سیکیورٹی سائن ان
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await auth.signInWithCustomToken(__initial_auth_token);
                 } else {
                     await auth.signInAnonymously();
                 }
 
-                document.getElementById('cloud-status').className = "bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center";
+                document.getElementById('cloud-status').className = "bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-sans justify-center text-center";
                 document.getElementById('cloud-status').innerHTML = '<i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> <span>کلاؤڈ سیکیورٹی لاک فعال ہے۔ اب آپ کا کھاتہ مکمل طور پر محفوظ ہے۔</span>';
                 
                 lucide.createIcons();
                 loadSavedBillsFromCloud();
             } catch(e) {
-                console.error("Firebase Auth Error:", e);
-                document.getElementById('cloud-status').className = "bg-rose-50 border border-rose-200 text-rose-800 text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 font-sans justify-center";
-                document.getElementById('cloud-status').innerHTML = '<i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i> <span>فائر بیس لوڈ کرنے میں مسئلہ آیا! لوکل سیشن فعال ہے۔</span>';
+                console.error("Firebase Debug Error Details:", e);
+                
+                // لائیو سکرین ڈیبگر برائے کلاؤڈ ایررز
+                let errorDetails = e.message || e;
+                let recommendation = "آرٹفیکٹ/فائر بیس کنکشن کا مسئلہ۔";
+                
+                if (e.code === "auth/operation-not-allowed") {
+                    recommendation = "<b>حل:</b> اپنے فائر بیس کونسل (Firebase Console) میں جا کر Authentication سیکشن میں <b>Anonymous Sign-in</b> کو Enable کریں۔";
+                } else if (e.code === "auth/invalid-api-key" || errorDetails.includes("API key")) {
+                    recommendation = "<b>حل:</b> آپ کی فائر بیس API Key غلط ہے، فائر بیس کونسل سے درست کنفیگ کاپی کریں۔";
+                } else if (errorDetails.includes("not-found") || errorDetails.includes("permission-denied")) {
+                    recommendation = "<b>حل:</b> فائر بیس فائر اسٹور کے رولز (Firestore Rules) کو چیک کریں کہ وہ پبلک ریڈ/رائٹ کے لیے کھلے ہیں۔";
+                } else if (errorDetails.includes("appId")) {
+                    recommendation = "<b>حل:</b> آپ کی فائر بیس App ID درست نہیں ہے، اس کی تصدیق کریں۔";
+                }
+
+                document.getElementById('cloud-status').className = "bg-rose-50 border border-rose-200 text-rose-800 text-xs px-3 py-3 rounded-lg flex flex-col gap-1.5 font-sans items-center text-center justify-center";
+                document.getElementById('cloud-status').innerHTML = `
+                    <div class="flex items-center gap-1.5 font-bold text-rose-700">
+                        <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0"></i> 
+                        <span>کلاؤڈ سیکیورٹی لاک فعال ہونے میں مسئلہ آیا!</span>
+                    </div>
+                    <div class="text-[10px] text-rose-600 bg-rose-100/50 p-2 rounded border border-rose-200/50 font-mono mt-1 w-full max-w-xl break-all">
+                        <b>پکڑا گیا ایرر:</b> ${errorDetails}<br>${recommendation}
+                    </div>
+                `;
                 lucide.createIcons();
             }
         }
@@ -875,9 +948,26 @@
             }).catch(err => { showNotification("تصویر بنانے میں کوئی مسئلہ پیش آیا ہے!", "error"); });
         }
 
-        function shareOnWhatsApp() {
-            if (currentBill.items.length === 0) { showNotification("واٹس ایپ پر بھیجنے کے لیے پہلے فائنل بل بنانا لازمی ہے!", "error"); return; }
-            
+        // --- 🔗 جدید واٹس ایپ مینو کے فنکشنز ---
+        function openShareModal() {
+            if (currentBill.items.length === 0) { 
+                showNotification("واٹس ایپ پر بھیجنے کے لیے پہلے فائنل بل بنانا لازمی ہے!", "error"); 
+                return; 
+            }
+            const modal = document.getElementById('share-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('translate-y-10', 'sm:scale-95');
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('share-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.add('translate-y-10', 'sm:scale-95');
+        }
+
+        // واٹس ایپ لکھائی والا بل (ٹیکسٹ)
+        function shareOnWhatsAppText() {
+            closeShareModal();
             let text = `*نیو قاری ہوزری سٹور - ڈیجیٹل بل*\n`;
             text += `---------------------------------\n`;
             text += `*بل نمبر:* ${currentBill.id}\n`;
@@ -904,6 +994,67 @@
             const encodedText = encodeURIComponent(text);
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedText}`;
             window.open(whatsappUrl, '_blank');
+        }
+
+        // واٹس ایپ خوبصورت تصویری بل (Image)
+        async function shareOnWhatsAppImage() {
+            closeShareModal();
+            showNotification("امیج بل تیار کیا جا رہا ہے، برائے مہربانی انتظار کریں...", "success");
+            const receiptElement = document.getElementById('screen-receipt-view');
+
+            try {
+                // html2canvas کی مدد سے خوبصورت ایچ ڈی تصویر بنانا
+                const canvas = await html2canvas(receiptElement, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+                
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        showNotification("امیج بنانے میں خرابی آئی ہے!", "error");
+                        return;
+                    }
+                    
+                    const file = new File([blob], `${currentBill.id}_رسید.png`, { type: 'image/png' });
+
+                    // موبائل فونز کے لیے لائیو مینو شیئرنگ کا ٹیسٹ (Web Share API)
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: `بل رسید نمبر ${currentBill.id}`,
+                                text: `نیو قاری ہوزری سٹور - بل نمبر: ${currentBill.id}`
+                            });
+                            showNotification("بل کی تصویر کامیابی سے واٹس ایپ پر منتقل کر دی گئی ہے!");
+                        } catch (shareErr) {
+                            // اگر یوزر نے مینو بند کر دیا تو کوئی ایرر شو نہیں کریں گے
+                            console.log("User cancelled share");
+                        }
+                    } else {
+                        // کمپیوٹر یا نان-سپورٹڈ براؤزر کے لیے فال بیک: کلپ بورڈ کاپی
+                        try {
+                            const item = new ClipboardItem({ "image/png": blob });
+                            await navigator.clipboard.write([item]);
+                            showNotification("📋 بل تصویر کلپ بورڈ پر کاپی ہو گئی ہے! اب واٹس ایپ پر جا کر صرف Paste (کنٹرول + V) کریں اور بھیج دیں۔", "success");
+                            
+                            // واٹس ایپ کھولنے کی کوشش
+                            setTimeout(() => {
+                                window.open("https://web.whatsapp.com", "_blank");
+                            }, 3000);
+                        } catch (clipboardErr) {
+                            // آخری مضبوط حل: ڈاؤن لوڈ اور دستی گائیڈ
+                            const image = canvas.toDataURL("image/png");
+                            const link = document.createElement('a');
+                            link.download = `${currentBill.id}_رسید.png`;
+                            link.href = image;
+                            link.click();
+                            
+                            // ڈائیلاگ میسج باکس کا متبادل (Alert bypass fallback check)
+                            showNotification("📥 تصویر گیلری میں ڈاؤن لوڈ ہو چکی ہے! اب اسے واٹس ایپ پر گیلری سے بھیجیں۔", "success");
+                        }
+                    }
+                }, 'image/png');
+            } catch (canvasErr) {
+                console.error(canvasErr);
+                showNotification("تصویر بنانے کے عمل میں کوئی مسئلہ پیش آیا ہے!", "error");
+            }
         }
 
         function resetBill() {
