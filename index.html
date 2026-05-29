@@ -27,7 +27,6 @@
             font-family: 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'Jonameisl', 'Noto Nastaliq Urdu', serif !important;
         }
 
-        /* فونٹ سائز کو چھوٹا اور کامپیکٹ کیا گیا ہے */
         body {
             font-size: 0.95rem;
             line-height: 1.8;
@@ -37,16 +36,18 @@
             line-height: 2;
         }
 
-        /* پرنٹ کے لیے کسٹم پیج بریک اور اسٹائلز */
+        /* پرنٹ کے لیے مخصوص اور فول پروف اسٹائلز */
         #perfect-print-area {
             display: none;
         }
 
         @media print {
+            /* اسکرین کا سب کچھ چھپائیں */
             body * {
                 display: none !important;
                 visibility: hidden !important;
             }
+            /* صرف پرنٹ ایریا کو ظاہر کریں */
             #perfect-print-area, #perfect-print-area * {
                 display: block !important;
                 visibility: visible !important;
@@ -100,7 +101,7 @@
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-pink-50 text-slate-800 min-h-screen flex flex-col pb-12">
 
-    <!-- ہیڈر / سرورق (نیا برائٹ گریڈیئنٹ) -->
+    <!-- ہیڈر -->
     <header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg py-3 px-4 no-print">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
             <div class="text-center md:text-right">
@@ -154,7 +155,7 @@
                         <input type="text" id="custom-item-name" placeholder="یہاں آئٹم کا نام لکھیں..." class="w-full px-2 py-1 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs font-medium">
                     </div>
 
-                    <!-- فوری انتخاب ٹیگز (رنگین ہائی لائٹڈ) -->
+                    <!-- فوری انتخاب ٹیگز -->
                     <div>
                         <div class="flex flex-wrap gap-1">
                             <button onclick="selectQuickItem('جراب')" class="quick-tag-btn px-2.5 py-0.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white rounded-lg text-xs font-medium transition-all border border-indigo-100 shadow-sm">جراب</button>
@@ -174,7 +175,7 @@
                     <div id="calc-screen" class="text-2xl font-bold tracking-wider truncate mt-0.5 text-emerald-400">0</div>
                 </div>
 
-                <!-- کیلکولیٹر کی بورڈ (رنگین بٹنز) -->
+                <!-- کیلکولیٹر کی بورڈ -->
                 <div class="grid grid-cols-4 gap-1.5">
                     <button onclick="clearCalc()" class="calc-btn col-span-2 bg-rose-100 text-rose-700 hover:bg-rose-600 hover:text-white font-bold py-1.5 rounded-xl text-center text-sm shadow-sm transition-all">صاف کریں (C)</button>
                     <button onclick="pressOperator('/')" class="calc-btn bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white font-bold py-1.5 rounded-xl text-sm text-center shadow-sm transition-all">÷</button>
@@ -217,13 +218,11 @@
                         <span id="ledger-count" class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-bold">0 رقمیں</span>
                     </div>
 
-                    <!-- خالی فہرست کارڈ -->
                     <div id="ledger-empty" class="text-center py-8 text-slate-400 text-sm">
                         <i data-lucide="shopping-cart" class="w-8 h-8 mx-auto stroke-1 opacity-40 mb-1.5"></i>
                         <p>کوئی رقم موجود نہیں ہے۔ پروڈکٹ منتخب کر کے "فہرست میں شامل کریں" دبائیں۔</p>
                     </div>
 
-                    <!-- لسٹ کے آئٹمز کا کنٹینر -->
                     <div class="space-y-2 max-h-[220px] overflow-y-auto pl-0.5 hidden" id="ledger-items-container"></div>
                 </div>
 
@@ -246,12 +245,14 @@
             <!-- ڈیجیٹل رسید کارڈ -->
             <div id="receipt-card" class="bg-white rounded-2xl shadow-lg border-t-4 border-pink-500 p-4 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
                 
-                <!-- اسکرین پر نظر آنے والی فائنل رسید -->
-                <div id="screen-receipt-view" class="space-y-4 bg-gradient-to-b from-white to-slate-50/50 p-3 rounded-xl border border-slate-100">
-                    <!-- رسید کا ہیڈر -->
+                <!-- اسکرین پر نظر آنے والی فائنل رسید (اور تصویر ڈاؤن لوڈ کرنے کا ہینڈلر) -->
+                <div id="screen-receipt-view" class="space-y-4 bg-gradient-to-b from-white to-slate-50/50 p-4 rounded-xl border border-slate-100">
+                    <!-- رسید کا برانڈڈ ہیڈر (اب یہاں بھی دکان کا نام اور پتہ سیٹ ہے) -->
                     <div class="text-center pb-3 border-b border-dashed border-slate-300">
-                        <h2 class="heading-urdu text-2xl font-bold text-slate-800">حساب کتاب کی فائنل رسید</h2>
-                        <p class="text-2xs text-slate-400 -mt-1 tracking-wider">DIGITAL BILLING SYSTEM</p>
+                        <h2 class="heading-urdu text-2xl font-bold text-slate-900 tracking-wide">نیو قاری ہوزری سٹور</h2>
+                        <p class="text-xs text-slate-600 font-medium">نزد مبارک مسجد قائد اعظم مارکیٹ فیصل آباد</p>
+                        <p class="text-xs text-indigo-700 font-bold font-mono mt-0.5">موبائل نمبر : 03065378112</p>
+                        
                         <div class="grid grid-cols-2 text-xs text-slate-500 mt-3 text-right bg-slate-100/70 p-1.5 rounded-lg border border-slate-200/50">
                             <div>
                                 <span class="font-bold text-slate-600">بل نمبر:</span> <span id="bill-id-display" class="font-mono text-pink-700 font-bold">--</span>
@@ -288,16 +289,15 @@
                         
                         <div class="grid grid-cols-2 items-center gap-4 py-1 bg-slate-100/50 p-2 rounded-xl border border-slate-200/40">
                             <div class="flex items-center gap-1.5">
-                                <label class="text-2xs font-bold text-slate-600 shrink-0">رعایت (%)</label>
+                                <label class="text-sm font-bold text-slate-600 shrink-0">رعایت (%)</label>
                                 <input type="number" id="discount-pct" min="0" max="100" value="0" oninput="calculateTotals()" class="w-12 px-1 py-0.5 border border-slate-200 rounded text-center font-mono focus:ring-1 focus:ring-pink-500 focus:outline-none">
                             </div>
                             <div class="flex items-center gap-1.5 justify-end">
-                                <label class="text-2xs font-bold text-slate-600 shrink-0">ٹیکس (%)</label>
+                                <label class="text-sm font-bold text-slate-600 shrink-0">ٹیکس (%)</label>
                                 <input type="number" id="tax-pct" min="0" max="100" value="0" oninput="calculateTotals()" class="w-12 px-1 py-0.5 border border-slate-200 rounded text-center font-mono focus:ring-1 focus:ring-pink-500 focus:outline-none">
                             </div>
                         </div>
 
-                        <!-- تصویر پر فیلڈز شو ہونا -->
                         <div id="print-discount-row" class="flex justify-between text-slate-500 text-2xs">
                             <span>رعایت (<span id="print-discount-pct">0</span>%):</span>
                             <span class="font-mono text-rose-600">- روپے <span id="print-discount-val">0.00</span></span>
@@ -314,7 +314,7 @@
                     </div>
                 </div>
 
-                <!-- رسید ایکشن بٹنز (ملٹی کلرڈ ڈیزائن) -->
+                <!-- رسید ایکشن بٹنز -->
                 <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button onclick="saveCurrentBill()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-1.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1 transition shadow-sm">
                         <i data-lucide="save" class="w-3.5 h-3.5"></i>
@@ -350,12 +350,15 @@
         </div>
     </main>
 
-    <!-- 📥 خصوصی خفیہ پرنٹ ایریا (کبھی خالی نہیں آئے گا) -->
+    <!-- 📥 خصوصی خفیہ برنٹ برانڈڈ ایریا (جو فائنل پیپر پر پرنٹ ہوگا) -->
     <div id="perfect-print-area">
         <div style="text-align: center; border-bottom: 2px dashed #000000; padding-bottom: 12px; margin-bottom: 15px;">
-            <h2 style="font-size: 24px; font-weight: bold; margin: 0;">حساب کتاب کی فائنل رسید</h2>
-            <p style="font-size: 12px; margin: 3px 0 0 0; color: #555; tracking: 1px;">DIGITAL BILLING SYSTEM</p>
-            <table style="width: 100%; font-size: 12px; margin-top: 10px; text-align: right;">
+            <!-- آپ کی دکان کا نام بولڈ فونٹ میں -->
+            <h2 style="font-size: 26px; font-weight: bold; margin: 0; padding: 0;">نیو قاری ہوزری سٹور</h2>
+            <p style="font-size: 14px; margin: 4px 0 0 0; color: #333333; font-weight: 500;">نزد مبارک مسجد قائد اعظم مارکیٹ فیصل آباد</p>
+            <p style="font-size: 14px; margin: 2px 0 0 0; color: #000000; font-family: monospace; font-weight: bold;">موبائل نمبر : 03065378112</p>
+            
+            <table style="width: 100%; font-size: 13px; margin-top: 15px; text-align: right;">
                 <tr>
                     <td><b>بل نمبر:</b> <span id="print-bill-id">--</span></td>
                     <td style="text-align: left;"><b>تاریخ:</b> <span id="print-bill-date">--</span></td>
@@ -365,7 +368,7 @@
 
         <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 14px;">
             <thead>
-                <tr style="border-bottom: 1px solid #000000; color: #333;">
+                <tr style="border-bottom: 1px solid #000000; color: #222;">
                     <th style="padding-bottom: 6px; font-weight: bold; font-size: 15px;">آئٹم کا نام</th>
                     <th style="padding-bottom: 6px; text-align: left; font-weight: bold; font-size: 15px;">تفصیلِ حساب (تعداد × قیمت = کل رقم)</th>
                 </tr>
@@ -391,7 +394,7 @@
                 <span>روپے <span id="print-grandtotal-val">0.00</span></span>
             </div>
         </div>
-        <p style="text-align: center; font-size: 11px; margin-top: 30px; color: #666; border-top: 1px solid #eee; padding-top: 8px;">بلنگ اور سمارٹ کیلکولیٹر ٹول کے ذریعے تیار کردہ۔</p>
+        <p style="text-align: center; font-size: 11px; margin-top: 30px; color: #555; border-top: 1px solid #eee; padding-top: 8px;">بلنگ اور سمارٹ کیلکولیٹر ٹول کے ذریعے تیار کردہ۔</p>
     </div>
 
     <!-- کسٹم نوٹیفکیشن الرٹ بکس -->
@@ -409,7 +412,6 @@
 
     <!-- جاوا اسکرپٹ کوڈ لاجک -->
     <script>
-        // لائیو تاریخ ترتیب دینا
         document.getElementById('live-date').innerText = new Date().toLocaleDateString('ur-PK', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
@@ -620,6 +622,7 @@
 
             currentBill.subtotal = subtotal; currentBill.discount = discountPct; currentBill.tax = taxPct; currentBill.grandTotal = grandTotal;
 
+            // اسکرین ویوز اپ ڈیٹ کرنا
             document.getElementById('subtotal-val').innerText = subtotal.toFixed(2);
             document.getElementById('grandtotal-val').innerText = grandTotal.toFixed(2);
             document.getElementById('print-discount-pct').innerText = discountPct;
@@ -629,7 +632,7 @@
             document.getElementById('print-discount-row').style.display = discountPct > 0 ? 'flex' : 'none';
             document.getElementById('print-tax-row').style.display = taxPct > 0 ? 'flex' : 'none';
 
-            // پرنٹ ڈیٹا اپڈیٹ
+            // 📥 برانڈڈ خفیہ پرنٹ ڈیٹا اپڈیٹ
             document.getElementById('print-bill-id').innerText = currentBill.id;
             document.getElementById('print-bill-date').innerText = currentBill.date;
             document.getElementById('print-subtotal-val').innerText = subtotal.toFixed(2);
