@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons برائے شبیہیں -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2canvas لائبریری برائے تصویر ڈاؤن لوڈ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         /* جمیل نوری نستعلیق فونٹ کو انٹرنیٹ سے لنک کرنا */
@@ -215,8 +217,8 @@
             <div id="receipt-card" class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
                 <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-600"></div>
 
-                <!-- پرنٹ ایبل حصہ -->
-                <div id="printable-receipt" class="space-y-6">
+                <!-- پرنٹ ایبل حصہ (اس حصے کا اسکرین شاٹ تصویر بنے گا) -->
+                <div id="printable-receipt" class="space-y-6 bg-white p-2 rounded-xl">
                     <!-- رسید کا ہیڈر -->
                     <div class="text-center pb-4 border-b border-dashed border-slate-200">
                         <h2 class="heading-urdu text-3xl font-bold text-slate-800">حساب کتاب کی فائنل رسید</h2>
@@ -244,7 +246,7 @@
                         </table>
                         <div id="empty-state" class="text-center py-12 text-slate-400 text-base">
                             <i data-lucide="receipt" class="w-12 h-12 mx-auto stroke-1 opacity-60 mb-2"></i>
-                            <p>ابھی تک کوئی پکا بل تیار نہیں کیا گیا ہے۔</p>
+                            <p>ابھی تک کوئی پکا بل تیار نہیں করা گیا ہے۔</p>
                         </div>
                     </div>
 
@@ -266,12 +268,12 @@
                             </div>
                         </div>
 
-                        <!-- پرنٹنگ لیبلز -->
-                        <div class="hidden print:flex justify-between text-sm text-slate-500">
+                        <!-- تصویر اور پرنٹ پر ڈسکاؤنٹ اور ٹیکس کا سادہ ڈسپلے -->
+                        <div id="print-discount-row" class="flex justify-between text-sm text-slate-500">
                             <span>ڈسکاؤنٹ (<span id="print-discount-pct">0</span>%):</span>
                             <span class="font-mono">- روپے <span id="print-discount-val">0.00</span></span>
                         </div>
-                        <div class="hidden print:flex justify-between text-sm text-slate-500">
+                        <div id="print-tax-row" class="flex justify-between text-sm text-slate-500">
                             <span>ٹیکس (<span id="print-tax-pct">0</span>%):</span>
                             <span class="font-mono">+ روپے <span id="print-tax-val">0.00</span></span>
                         </div>
@@ -284,25 +286,29 @@
                 </div>
 
                 <!-- رسید ایکشن بٹنز -->
-                <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-3 gap-3 no-print">
-                    <button onclick="saveCurrentBill()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-lg text-base flex items-center justify-center gap-2 transition shadow-sm">
+                <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-2 no-print">
+                    <button onclick="saveCurrentBill()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition shadow-sm">
                         <i data-lucide="save" class="w-4 h-4"></i>
-                        بل محفوظ کریں
+                        بل سیو کریں
                     </button>
-                    <button onclick="printBill()" class="bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 px-3 rounded-lg text-base flex items-center justify-center gap-2 transition shadow-sm">
+                    <button onclick="downloadBillAsImage()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition shadow-sm">
+                        <i data-lucide="image" class="w-4 h-4"></i>
+                        تصویر ڈاؤن لوڈ 🖼️
+                    </button>
+                    <button onclick="printBill()" class="bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 px-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition shadow-sm">
                         <i data-lucide="printer" class="w-4 h-4"></i>
-                        پرنٹ یا PDF لیں
+                        پرنٹ / PDF
                     </button>
-                    <button onclick="resetBill()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2 px-3 rounded-lg text-base flex items-center justify-center gap-2 transition">
+                    <button onclick="resetBill()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2 px-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                        نیا بل شروع کریں
+                        نیا بل بنائیں
                     </button>
                 </div>
             </div>
 
-            <!-- بلز کی مستقل ہسٹری ریکارڈ -->
+            <!-- محفوظ شدہ بلوں کا ریکارڈ -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2 mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2 mb-4 pb-2 border-b border-b-slate-100">
                     <i data-lucide="history" class="w-5 h-5 text-slate-600"></i>
                     محفوظ شدہ پرانے بلوں کا ریکارڈ
                 </h3>
@@ -315,7 +321,7 @@
         </div>
     </main>
 
-    <!-- کسٹم نوٹیفکیشن الرٹ بکس (ٹاپ سینٹر اینیمیٹڈ) -->
+    <!-- کسٹم نوٹیفکیشن الرٹ بکس -->
     <div id="toast-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 transition-all duration-300 z-[9999] pointer-events-none no-print border border-slate-700/50 max-w-sm sm:max-w-md w-[90%] -translate-y-20 opacity-0">
         <span id="toast-icon-container" class="p-1.5 rounded-full bg-emerald-500 text-slate-950 shrink-0">
             <i data-lucide="check" class="w-4 h-4"></i>
@@ -330,26 +336,14 @@
 
     <!-- جاوا اسکرپٹ کوڈ لاجک -->
     <script>
-        // لائیو تاریخ کو اردو فارمیٹ میں سیٹ کرنا
         document.getElementById('live-date').innerText = new Date().toLocaleDateString('ur-PK', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        // کاروباری متغیرات (State Management)
         let ledgerItems = [];
         let currentBill = {
-            id: generateBillId(),
-            date: new Date().toLocaleString('ur-PK'),
-            items: [],
-            discount: 0,
-            tax: 0,
-            subtotal: 0,
-            grandTotal: 0
+            id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0
         };
-
         let savedBills = [];
         let calcInput = "0";
         let isNewInput = true;
@@ -365,14 +359,11 @@
             loadSavedBillsFromLocalStorage();
         };
 
-        // اسمارٹ ٹاپ سینٹر نوٹیفکیشن پاپ اپ ہر آئٹم کے لیے
         function showNotification(message, type = 'success') {
             const toast = document.getElementById('toast-message');
             const toastText = document.getElementById('toast-text');
             const iconContainer = document.getElementById('toast-icon-container');
-            
             toastText.innerText = message;
-            
             if (type === 'success') {
                 iconContainer.className = "p-1.5 rounded-full bg-emerald-500 text-slate-950 shrink-0";
                 iconContainer.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
@@ -381,14 +372,9 @@
                 iconContainer.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i>';
             }
             lucide.createIcons();
-
-            if (toastTimeout) {
-                clearTimeout(toastTimeout);
-            }
-
+            if (toastTimeout) clearTimeout(toastTimeout);
             toast.classList.remove('-translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
-
             toastTimeout = setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('-translate-y-20', 'opacity-0');
@@ -396,76 +382,49 @@
             }, 3000);
         }
 
-        // --- اسمارٹ کیلکولیٹر کے اعمال ---
+        // --- اسمارٹ کیلکولیٹر ---
         const calcScreen = document.getElementById('calc-screen');
         const calcHistoryDiv = document.getElementById('calc-history');
 
         function pressNum(num) {
-            if (isNewInput || calcInput === "0") {
-                calcInput = num;
-                isNewInput = false;
-            } else {
-                calcInput += num;
-            }
+            if (isNewInput || calcInput === "0") { calcInput = num; isNewInput = false; }
+            else { calcInput += num; }
             updateCalcDisplay();
         }
 
         function pressOperator(op) {
             let lastChar = calcInput.slice(-1);
-            if (['+', '-', '*', '/'].includes(lastChar)) {
-                calcInput = calcInput.slice(0, -1) + op;
-            } else {
-                calcInput += op;
-            }
+            if (['+', '-', '*', '/'].includes(lastChar)) { calcInput = calcInput.slice(0, -1) + op; }
+            else { calcInput += op; }
             isNewInput = false;
             updateCalcDisplay();
         }
 
-        function clearCalc() {
-            calcInput = "0";
-            isNewInput = true;
-            calcHistoryDiv.innerText = "";
-            updateCalcDisplay();
-        }
-
+        function clearCalc() { calcInput = "0"; isNewInput = true; calcHistoryDiv.innerText = ""; updateCalcDisplay(); }
         function deleteLast() {
-            if (calcInput.length > 1) {
-                calcInput = calcInput.slice(0, -1);
-            } else {
-                calcInput = "0";
-                isNewInput = true;
-            }
+            if (calcInput.length > 1) { calcInput = calcInput.slice(0, -1); }
+            else { calcInput = "0"; isNewInput = true; }
             updateCalcDisplay();
         }
-
-        function updateCalcDisplay() {
-            calcScreen.innerText = calcInput;
-        }
+        function updateCalcDisplay() { calcScreen.innerText = calcInput; }
 
         function solveCalculation() {
             try {
                 let sanitizedExpr = calcInput.replace(/×/g, '*').replace(/÷/g, '/');
                 let result = eval(sanitizedExpr);
-                if (result % 1 !== 0) {
-                    result = parseFloat(result.toFixed(2));
-                }
+                if (result % 1 !== 0) result = parseFloat(result.toFixed(2));
                 return result;
-            } catch (e) {
-                return null;
-            }
+            } catch (e) { return null; }
         }
 
         // --- ڈراپ ڈاؤن لسٹ مینجمنٹ ---
         function handleItemSelectChange() {
             const select = document.getElementById('item-select');
             const customContainer = document.getElementById('custom-name-container');
-            
             if (select.value === 'custom') {
                 customContainer.classList.remove('hidden');
                 document.getElementById('custom-item-name').focus();
-            } else {
-                customContainer.classList.add('hidden');
-            }
+            } else { customContainer.classList.add('hidden'); }
         }
 
         function selectQuickItem(itemName) {
@@ -475,23 +434,15 @@
             showNotification(`آپ نے "${itemName}" کو منتخب کر لیا ہے۔`);
         }
 
-        // عارضی لسٹ میں حساب کتاب شامل کرنا (5x600 فارمیٹ)
         function addCurrentToLedger() {
-            let qty = 1;
-            let price = 0;
-            let total = 0;
-            let expr = calcInput;
-
+            let qty = 1, price = 0, total = 0, expr = calcInput;
             const select = document.getElementById('item-select');
             let finalItemName = select.value;
 
             if (finalItemName === 'custom') {
                 const customInput = document.getElementById('custom-item-name');
                 finalItemName = customInput.value.trim();
-                if (finalItemName === "") {
-                    showNotification("براہ کرم پروڈکٹ کا کوئی نام درج کریں!", "error");
-                    return;
-                }
+                if (finalItemName === "") { showNotification("براہ کرم پروڈکٹ کا کوئی نام درج کریں!", "error"); return; }
             }
 
             if (expr.includes('*')) {
@@ -499,60 +450,32 @@
                 if (parts.length === 2) {
                     let possibleQty = parseFloat(parts[0]);
                     let possiblePrice = parseFloat(parts[1]);
-                    if (!isNaN(possibleQty) && !isNaN(possiblePrice)) {
-                        qty = possibleQty;
-                        price = possiblePrice;
-                        total = qty * price;
-                    }
+                    if (!isNaN(possibleQty) && !isNaN(possiblePrice)) { qty = possibleQty; price = possiblePrice; total = qty * price; }
                 }
             }
 
             if (price === 0) {
                 let val = solveCalculation();
-                if (val === null || isNaN(val) || val <= 0) {
-                    val = parseFloat(calcInput);
-                }
-                if (isNaN(val) || val <= 0) {
-                    showNotification("براہ کرم کیلکولیٹر پر درست قیمت یا حساب لکھیں!", "error");
-                    return;
-                }
-                price = val;
-                qty = 1;
-                total = val;
+                if (val === null || isNaN(val) || val <= 0) val = parseFloat(calcInput);
+                if (isNaN(val) || val <= 0) { showNotification("براہ کرم کیلکولیٹر پر درست قیمت یا حساب لکھیں!", "error"); return; }
+                price = val; qty = 1; total = val;
             }
 
-            ledgerItems.push({
-                id: Date.now() + Math.random(),
-                name: finalItemName,
-                price: price,
-                qty: qty,
-                total: total
-            });
-
+            ledgerItems.push({ id: Date.now() + Math.random(), name: finalItemName, price: price, qty: qty, total: total });
             updateLedgerUI();
             animateAddButton();
 
-            const calculationString = `${qty} × ${price} = ${total} روپے`;
-            showNotification(`🎉 ${finalItemName} (${calculationString}) فہرست میں شامل ہو گیا!`, "success");
-
-            calcInput = "0";
-            isNewInput = true;
-            calcHistoryDiv.innerText = "";
-            updateCalcDisplay();
-            
-            if (select.value === 'custom') {
-                document.getElementById('custom-item-name').value = "";
-            }
+            showNotification(`🎉 ${finalItemName} (${qty} × ${price} = ${total} روپے) فہرست میں شامل ہو گیا!`, "success");
+            calcInput = "0"; isNewInput = true; calcHistoryDiv.innerText = ""; updateCalcDisplay();
+            if (select.value === 'custom') document.getElementById('custom-item-name').value = "";
         }
 
         function animateAddButton() {
             const btn = document.getElementById('add-to-ledger-btn');
             const btnText = document.getElementById('btn-text');
-            
             btn.classList.remove('bg-teal-600', 'hover:bg-teal-700');
             btn.classList.add('bg-emerald-500');
             btnText.innerText = "شامل ہو گیا! ✓";
-
             setTimeout(() => {
                 btn.classList.remove('bg-emerald-500');
                 btn.classList.add('bg-teal-600', 'hover:bg-teal-700');
@@ -560,7 +483,6 @@
             }, 1200);
         }
 
-        // لسٹ کا گرافک یو آئی رینڈر کرنا (بگ فری موڈ)
         function updateLedgerUI() {
             const container = document.getElementById('ledger-items-container');
             const emptyState = document.getElementById('ledger-empty');
@@ -568,32 +490,23 @@
             const runningTotalDisplay = document.getElementById('ledger-running-total');
 
             container.innerHTML = "";
-            
             if (ledgerItems.length === 0) {
-                emptyState.classList.remove('hidden');
-                container.classList.add('hidden');
-                countDisplay.innerText = "0 رقمیں";
-                runningTotalDisplay.innerText = "0.00";
-                return;
+                emptyState.classList.remove('hidden'); container.classList.add('hidden');
+                countDisplay.innerText = "0 رقمیں"; runningTotalDisplay.innerText = "0.00"; return;
             }
 
-            emptyState.classList.add('hidden');
-            container.classList.remove('hidden');
+            emptyState.classList.add('hidden'); container.classList.remove('hidden');
             countDisplay.innerText = `${ledgerItems.length} رقمیں`;
-
             let runningTotal = 0;
 
             ledgerItems.forEach((item, index) => {
                 runningTotal += item.total;
                 const row = document.createElement('div');
                 row.className = "flex flex-col gap-1.5 bg-slate-50 border border-slate-200 p-3 rounded-xl transition hover:border-teal-400 text-base";
-                
-                const calculationString = `${item.qty} × ${item.price} = ${item.total}`;
-
                 row.innerHTML = `
                     <div class="flex items-center gap-3">
                         <span class="text-sm font-bold text-slate-400 w-5 text-center">${index + 1}</span>
-                        <input type="text" value="${item.name}" onchange="updateLedgerItemName(${item.id}, this.value)" placeholder="نام ترمیم کریں" class="flex-grow bg-white border border-slate-200 rounded px-2.5 py-0.5 text-base focus:outline-none focus:ring-1 focus:ring-teal-500 font-medium">
+                        <input type="text" value="${item.name}" onchange="updateLedgerItemName(${item.id}, this.value)" class="flex-grow bg-white border border-slate-200 rounded px-2.5 py-0.5 text-base focus:outline-none focus:ring-1 focus:ring-teal-500 font-medium">
                         <button onclick="removeLedgerItem(${item.id})" class="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded-lg transition">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
@@ -603,60 +516,35 @@
                             <span>تعداد: <input type="number" min="1" value="${item.qty}" onchange="updateLedgerItemQty(${item.id}, this.value)" class="w-12 px-1 border border-slate-200 rounded text-center font-mono"></span>
                             <span>قیمت: <input type="number" value="${item.price}" onchange="updateLedgerItemPrice(${item.id}, this.value)" class="w-20 px-1 border border-slate-200 rounded text-center font-mono"></span>
                         </div>
-                        <span class="font-mono font-bold text-teal-700 text-base bg-teal-50 px-2.5 py-0.5 rounded-md">${calculationString} روپے</span>
+                        <span class="font-mono font-bold text-teal-700 text-base bg-teal-50 px-2.5 py-0.5 rounded-md">${item.qty} × ${item.price} = ${item.total} روپے</span>
                     </div>
                 `;
                 container.appendChild(row);
             });
-
             runningTotalDisplay.innerText = runningTotal.toFixed(2);
             lucide.createIcons();
         }
 
         function updateLedgerItemName(id, newName) {
             const item = ledgerItems.find(i => i.id === id);
-            if (item && newName.trim() !== "") {
-                item.name = newName.trim();
-            }
+            if (item && newName.trim() !== "") item.name = newName.trim();
         }
-
         function updateLedgerItemQty(id, newQty) {
-            const item = ledgerItems.find(i => i.id === id);
-            const qtyVal = parseInt(newQty);
-            if (item && !isNaN(qtyVal) && qtyVal > 0) {
-                item.qty = qtyVal;
-                item.total = item.qty * item.price;
-                updateLedgerUI();
-            }
+            const item = ledgerItems.find(i => i.id === id); const qtyVal = parseInt(newQty);
+            if (item && !isNaN(qtyVal) && qtyVal > 0) { item.qty = qtyVal; item.total = item.qty * item.price; updateLedgerUI(); }
         }
-
         function updateLedgerItemPrice(id, newPrice) {
-            const item = ledgerItems.find(i => i.id === id);
-            const priceVal = parseFloat(newPrice);
-            if (item && !isNaN(priceVal) && priceVal >= 0) {
-                item.price = priceVal;
-                item.total = item.qty * item.price;
-                updateLedgerUI();
-            }
+            const item = ledgerItems.find(i => i.id === id); const priceVal = parseFloat(newPrice);
+            if (item && !isNaN(priceVal) && priceVal >= 0) { item.price = priceVal; item.total = item.qty * item.price; updateLedgerUI(); }
         }
+        function removeLedgerItem(id) { ledgerItems = ledgerItems.filter(item => item.id !== id); updateLedgerUI(); showNotification("رقم فہرست سے حذف کر دی گئی ہے۔", "success"); }
 
-        function removeLedgerItem(id) {
-            ledgerItems = ledgerItems.filter(item => item.id !== id);
-            updateLedgerUI();
-            showNotification("رقم فہرست سے حذف کر دی گئی ہے۔", "success");
-        }
-
-        // --- فائنل پکا بل بنانے کا عمل ---
+        // --- فائنل بل میکر ---
         function generateBillFromLedger() {
-            if (ledgerItems.length === 0) {
-                showNotification("بل بنانے سے پہلے فہرست میں کچھ آئٹمز شامل کریں!", "error");
-                return;
-            }
-
+            if (ledgerItems.length === 0) { showNotification("بل بنانے سے پہلے فہرست میں کچھ آئٹمز شامل کریں!", "error"); return; }
             currentBill.items = JSON.parse(JSON.stringify(ledgerItems));
             currentBill.id = generateBillId();
             currentBill.date = new Date().toLocaleString('ur-PK');
-
             calculateTotals();
             showNotification("مبارک ہو! حساب کتاب کی فائنل رسید تیار ہو گئی ہے۔");
             document.getElementById('receipt-card').scrollIntoView({ behavior: 'smooth' });
@@ -664,21 +552,14 @@
 
         function calculateTotals() {
             let subtotal = 0;
-            currentBill.items.forEach(item => {
-                subtotal += item.total;
-            });
-
+            currentBill.items.forEach(item => subtotal += item.total);
             const discountPct = parseFloat(document.getElementById('discount-pct').value) || 0;
             const taxPct = parseFloat(document.getElementById('tax-pct').value) || 0;
-
             const discountVal = (subtotal * discountPct) / 100;
             const taxVal = ((subtotal - discountVal) * taxPct) / 100;
             const grandTotal = subtotal - discountVal + taxVal;
 
-            currentBill.subtotal = subtotal;
-            currentBill.discount = discountPct;
-            currentBill.tax = taxPct;
-            currentBill.grandTotal = grandTotal;
+            currentBill.subtotal = subtotal; currentBill.discount = discountPct; currentBill.tax = taxPct; currentBill.grandTotal = grandTotal;
 
             document.getElementById('subtotal-val').innerText = subtotal.toFixed(2);
             document.getElementById('grandtotal-val').innerText = grandTotal.toFixed(2);
@@ -688,31 +569,29 @@
             document.getElementById('print-tax-pct').innerText = taxPct;
             document.getElementById('print-tax-val').innerText = taxVal.toFixed(2);
 
+            // زیرو ویلیوز کو تصویر/پرنٹ پر چھپانا یا دکھانا
+            document.getElementById('print-discount-row').style.display = discountPct > 0 ? 'flex' : 'none';
+            document.getElementById('print-tax-row').style.display = taxPct > 0 ? 'flex' : 'none';
+
             updateBillUIDisplay();
         }
 
         function updateBillUIDisplay() {
             document.getElementById('bill-id-display').innerText = currentBill.id;
             document.getElementById('bill-date-display').innerText = currentBill.date;
-
             const tbody = document.getElementById('bill-items-body');
             const emptyState = document.getElementById('empty-state');
             tbody.innerHTML = "";
 
-            if (currentBill.items.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
+            if (currentBill.items.length === 0) { emptyState.classList.remove('hidden'); } 
+            else {
                 emptyState.classList.add('hidden');
-                
                 currentBill.items.forEach(item => {
                     const row = document.createElement('tr');
                     row.className = "hover:bg-slate-50 border-b border-slate-100 transition duration-150 text-base";
-                    
-                    const calculationString = `${item.qty} × ${item.price} = ${item.total}`;
-
                     row.innerHTML = `
                         <td class="py-2.5 text-slate-800 font-medium">${item.name}</td>
-                        <td class="py-2.5 text-left font-mono font-bold text-teal-800">${calculationString} روپے</td>
+                        <td class="py-2.5 text-left font-mono font-bold text-teal-800">${item.qty} × ${item.price} = ${item.total} روپے</td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -720,135 +599,99 @@
             lucide.createIcons();
         }
 
-        function resetBill() {
-            currentBill = {
-                id: generateBillId(),
-                date: new Date().toLocaleString('ur-PK'),
-                items: [],
-                discount: 0,
-                tax: 0,
-                subtotal: 0,
-                grandTotal: 0
+        // --- تصویر ڈاؤن لوڈ کرنے کا خصوصی فنکشن ---
+        function downloadBillAsImage() {
+            if (currentBill.items.length === 0) {
+                showNotification("تصویر ڈاؤن لوڈ کرنے کے لیے پہلے فائنل بل بنانا لازمی ہے!", "error");
+                return;
+            }
+
+            showNotification("تصویر تیار کی جا رہی ہے، براہ کرم ایک سیکنڈ انتظار کریں...", "success");
+            
+            const receiptElement = document.getElementById('printable-receipt');
+            
+            // تصویر بنانے کی جدید سیٹنگز
+            const options = {
+                scale: 2, // تصویر کا رزلٹ (کوالٹی) ڈبل کرنے کے لیے
+                backgroundColor: "#ffffff", // پس منظر سفید رکھنے کے لیے
+                useCORS: true // فونٹ فائل کو درست لوڈ کرنے کے لیے
             };
-            
-            ledgerItems = [];
-            document.getElementById('discount-pct').value = 0;
-            document.getElementById('tax-pct').value = 0;
-            
-            updateLedgerUI();
-            calculateTotals();
-            showNotification("تمام پرانا ڈیٹا صاف کر کے نیا بل فارمیٹ کھول دیا گیا ہے۔");
+
+            html2canvas(receiptElement, options).then(canvas => {
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.download = `${currentBill.id}_رسید.png`;
+                link.href = image;
+                link.click();
+                showNotification("🖼️ بل کی تصویر کامیابی سے ڈاؤن لوڈ ہو گئی ہے!");
+            }).catch(err => {
+                showNotification("تصویر بنانے میں کوئی مسئلہ پیش آیا ہے!", "error");
+            });
+        }
+
+        function resetBill() {
+            currentBill = { id: generateBillId(), date: new Date().toLocaleString('ur-PK'), items: [], discount: 0, tax: 0, subtotal: 0, grandTotal: 0 };
+            ledgerItems = []; document.getElementById('discount-pct').value = 0; document.getElementById('tax-pct').value = 0;
+            updateLedgerUI(); calculateTotals(); showNotification("تمام پرانا ڈیٹا صاف کر کے نیا بل فارمیٹ کھول دیا گیا ہے۔");
         }
 
         function printBill() {
-            if (currentBill.items.length === 0) {
-                showNotification("پرنٹ کرنے کے لیے پہلے بل بنانا لازمی ہے!", "error");
-                return;
-            }
+            if (currentBill.items.length === 0) { showNotification("پرنٹ کرنے کے لیے پہلے بل بنانا لازمی ہے!", "error"); return; }
             window.print();
         }
 
         function saveCurrentBill() {
-            if (currentBill.items.length === 0) {
-                showNotification("خالی بل کو محفوظ نہیں کیا جا سکتا!", "error");
-                return;
-            }
-
+            if (currentBill.items.length === 0) { showNotification("خالی بل کو محفوظ نہیں کیا جا سکتا!", "error"); return; }
             const existingIndex = savedBills.findIndex(b => b.id === currentBill.id);
             const billToSave = JSON.parse(JSON.stringify(currentBill));
-
-            if (existingIndex > -1) {
-                savedBills[existingIndex] = billToSave;
-                showNotification("محفوظ شدہ بل کو اپ ڈیٹ کر دیا گیا ہے۔");
-            } else {
-                savedBills.unshift(billToSave);
-                showNotification("بل کامیابی سے مستقل ریکارڈ میں محفوظ کر لیا گیا ہے۔");
-            }
-
-            saveSavedBillsToLocalStorage();
-            renderSavedBillsList();
+            if (existingIndex > -1) { savedBills[existingIndex] = billToSave; showNotification("محفوظ شدہ بل کو اپ ڈیٹ کر دیا گیا ہے۔"); } 
+            else { savedBills.unshift(billToSave); showNotification("بل کامیابی سے مستقل ریکارڈ میں محفوظ کر لیا گیا ہے۔"); }
+            saveSavedBillsToLocalStorage(); renderSavedBillsList();
         }
 
         function renderSavedBillsList() {
             const listContainer = document.getElementById('saved-bills-list');
             listContainer.innerHTML = "";
-
-            if (savedBills.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="text-center py-6 text-slate-400">
-                        ابھی تک کوئی بل محفوظ نہیں کیا گیا۔
-                    </div>
-                `;
-                return;
-            }
-
+            if (savedBills.length === 0) { listContainer.innerHTML = `<div class="text-center py-6 text-slate-400">ابھی تک کوئی پرانا بل محفوظ نہیں کیا گیا۔</div>`; return; }
             savedBills.forEach(bill => {
                 const card = document.createElement('div');
                 card.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-emerald-500 transition duration-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-base";
-                
                 card.innerHTML = `
                     <div onclick="loadSavedBill('${bill.id}')" class="cursor-pointer flex-grow space-y-0.5 w-full text-right">
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-slate-800">${bill.id}</span>
                             <span class="text-emerald-700 font-bold font-mono">روپے ${bill.grandTotal.toFixed(2)}</span>
                         </div>
-                        <div class="flex justify-between text-sm text-slate-400">
-                            <span>تاریخ: ${bill.date.split(',')[0]}</span>
-                            <span>کل آئٹمز: ${bill.items.length}</span>
-                        </div>
+                        <div class="flex justify-between text-sm text-slate-400"><span>تاریخ: ${bill.date.split(',')[0]}</span><span>کل آئٹمز: ${bill.items.length}</span></div>
                     </div>
                     <div class="flex gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200/60">
-                        <button onclick="loadSavedBill('${bill.id}')" class="p-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-600 transition flex items-center gap-1 text-sm px-2.5">
-                            <i data-lucide="eye" class="w-3.5 h-3.5"></i> ریکارڈ دیکھیں
-                        </button>
-                        <button onclick="deleteSavedBill('${bill.id}', event)" class="p-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        </button>
+                        <button onclick="loadSavedBill('${bill.id}')" class="p-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-600 transition flex items-center gap-1 text-sm px-2.5"><i data-lucide="eye" class="w-3.5 h-3.5"></i> ریکارڈ دیکھیں</button>
+                        <button onclick="deleteSavedBill('${bill.id}', event)" class="p-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                     </div>
                 `;
-                listContainer.appendChild(card);
             });
+            listContainer.appendChild(card);
             lucide.createIcons();
         }
 
         function loadSavedBill(billId) {
             const bill = savedBills.find(b => b.id === billId);
             if (bill) {
-                currentBill = JSON.parse(JSON.stringify(bill));
-                ledgerItems = JSON.parse(JSON.stringify(bill.items));
-                
-                document.getElementById('discount-pct').value = currentBill.discount;
-                document.getElementById('tax-pct').value = currentBill.tax;
-
-                updateLedgerUI();
-                calculateTotals();
-                showNotification(`${billId} کا فائنل بل لوڈ کر دیا گیا ہے۔`);
+                currentBill = JSON.parse(JSON.stringify(bill)); ledgerItems = JSON.parse(JSON.stringify(bill.items));
+                document.getElementById('discount-pct').value = currentBill.discount; document.getElementById('tax-pct').value = currentBill.tax;
+                updateLedgerUI(); calculateTotals(); showNotification(`${billId} کا فائنل بل لوڈ کر دیا گیا ہے۔`);
                 document.getElementById('receipt-card').scrollIntoView({ behavior: 'smooth' });
             }
         }
 
         function deleteSavedBill(billId, event) {
-            event.stopPropagation();
-            savedBills = savedBills.filter(b => b.id !== billId);
-            saveSavedBillsToLocalStorage();
-            renderSavedBillsList();
-            showNotification("بل مستقل ریکارڈ سے حذف کر دیا گیا ہے۔");
+            event.stopPropagation(); savedBills = savedBills.filter(b => b.id !== billId);
+            saveSavedBillsToLocalStorage(); renderSavedBillsList(); showNotification("بل مستقل ریکارڈ سے حذف کر دیا گیا ہے۔");
         }
-
-        function saveSavedBillsToLocalStorage() {
-            localStorage.setItem('billing_calculator_history', JSON.stringify(savedBills));
-        }
-
+        function saveSavedBillsToLocalStorage() { localStorage.setItem('billing_calculator_history', JSON.stringify(savedBills)); }
         function loadSavedBillsFromLocalStorage() {
             const data = localStorage.getItem('billing_calculator_history');
-            if (data) {
-                try {
-                    savedBills = JSON.parse(data);
-                    renderSavedBillsList();
-                } catch (e) {
-                    savedBills = [];
-                }
-            }
+            if (data) { try { savedBills = JSON.parse(data); renderSavedBillsList(); } catch (e) { savedBills = []; } }
         }
     </script>
 </body>
