@@ -3,525 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حساب کتاب اور بلنگ کیلکولیٹر - نیو قاری ہوزری سٹور</title>
-    
-    <!-- Tailwind CSS برائے ڈیزائننگ -->
+    <title>نیو قاری ہوزری سٹور - بلنگ سسٹم</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons برائے شبیہیں -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- html2canvas لائبریری برائے تصویر ڈاؤن لوڈ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <!-- ☁️ فائر بیس کلاؤڈ کی مستحکم لائبریریز -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    
     <style>
-        /* جمیل نوری نستعلیق فونٹ کو انٹرنیٹ سے لنک کرنا */
         @font-face {
             font-family: 'Jameel Noori Nastaleeq';
-            src: url('https://font.urdufonts.net/download.php?id=jameel-noori-nastaleeq-regular') format('truetype'),
-                 url('https://cdn.jsdelivr.net/gh/alif-type/jameel-noori-nastaleeq@main/Jameel%20Noori%20Nastaleeq.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
+            src: url('https://font.urdufonts.net/download.php?id=jameel-noori-nastaleeq-regular') format('truetype');
             font-display: swap;
         }
-
-        /* پورے صفحے پر جمیل نوری نستعلیق لاگو کرنا */
-        body, input, select, button, textarea, span, h1, h2, h3, th, td {
-            font-family: 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'Noto Nastaliq Urdu', serif !important;
-        }
-
-        body {
-            font-size: 1.05rem;
-            line-height: 1.8;
-        }
-
-        .heading-urdu {
+        body, input, button, span, th, td, h1, p, h2 {
             font-family: 'Jameel Noori Nastaleeq', serif !important;
-            line-height: 2;
         }
-
-        /* پرنٹ کے لیے مخصوص اور فول پروف اسٹائلز */
-        #perfect-print-area {
-            display: none;
-        }
-
         @media print {
-            body * {
-                display: none !important;
-                visibility: hidden !important;
-            }
-            #perfect-print-area, #perfect-print-area * {
-                display: block !important;
-                visibility: visible !important;
-            }
-            #perfect-print-area table, #perfect-print-area th, #perfect-print-area td {
-                display: table !important;
-                visibility: visible !important;
-            }
-            #perfect-print-area tr {
-                display: table-row !important;
-                visibility: visible !important;
-            }
-            #perfect-print-area th, #perfect-print-area td {
-                display: table-cell !important;
-                visibility: visible !important;
-            }
-            #perfect-print-area {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 30px !important;
-                background: #ffffff !important;
-                color: #000000 !important;
-            }
-        }
-
-        .calc-btn {
-            transition: all 0.1s ease;
-        }
-        .calc-btn:active {
-            transform: scale(0.92);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            .no-print { display: none !important; }
+            body { background: white !important; }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-pink-50 text-slate-800 min-h-screen flex flex-col pb-12">
+<body class="bg-slate-50 p-4">
 
-    <!-- ہیڈر گرافی ملٹی کلر تھیم -->
-    <header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg py-4 px-6 no-print">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="text-center md:text-right">
-                <h1 class="heading-urdu text-3xl md:text-4xl font-bold tracking-wide drop-shadow-md">نیو قاری ہوزری سٹور</h1>
-                <p class="text-indigo-100 text-sm md:text-base mt-1">جدید ڈیجیٹل بلنگ اور سیلز مینجمنٹ سسٹم</p>
-            </div>
-            <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/30 shadow-inner">
-                <i data-lucide="calendar" class="w-5 h-5 text-pink-200"></i>
-                <span id="live-date" class="font-medium text-sm md:text-base"></span>
-            </div>
-        </div>
+    <!-- ہیڈر -->
+    <header class="bg-indigo-700 text-white p-6 rounded-2xl shadow-lg text-center mb-6 no-print">
+        <h1 class="text-3xl font-bold">نیو قاری ہوزری سٹور</h1>
+        <p>قائد اعظم مارکیٹ، فیصل آباد | فون: 03065378112</p>
     </header>
 
-    <!-- مین کنٹینر -->
-    <main class="max-w-7xl mx-auto w-full px-4 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow no-print">
-        
-        <!-- بایاں حصہ: انٹری فارم اور کنٹرولز (5 کالم) -->
-        <section class="lg:col-span-5 space-y-6">
-            <!-- کسٹمر کی معلومات -->
-            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-                <h2 class="text-lg font-bold text-indigo-700 flex items-center gap-2 mb-4 border-b pb-2">
-                    <i data-lucide="user" class="w-5 h-5"></i> کسٹمر کی تفصیلات
-                </h2>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs text-slate-500 mb-1">کسٹمر / دکان کا نام</label>
-                        <input type="text" id="custName" placeholder="نام درج کریں..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-500 focus:bg-white text-sm transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-500 mb-1">فون نمبر / شہر</label>
-                        <input type="text" id="custPhone" placeholder="تفصیل درج کریں..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-500 focus:bg-white text-sm transition-all">
-                    </div>
-                </div>
-            </div>
-
-            <!-- مال کی انٹری -->
-            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-                <h2 class="text-lg font-bold text-indigo-700 flex items-center gap-2 mb-4 border-b pb-2">
-                    <i data-lucide="shopping-bag" class="w-5 h-5"></i> مال کی انٹری کریں
-                </h2>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs text-slate-500 mb-1">آئٹم کی تفصیل (مثلاً سمر کاٹن ساکس)</label>
-                        <input type="text" id="prodName" placeholder="مال کا نام منتخب کریں یا لکھیں..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-500 focus:bg-white text-sm transition-all">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs text-slate-500 mb-1">تعداد (درجن)</label>
-                            <input type="number" id="prodQty" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-500 focus:bg-white text-sm transition-all text-center font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-500 mb-1">ریٹ (فی درجن)</label>
-                            <input type="number" id="prodRate" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-500 focus:bg-white text-sm transition-all text-center font-bold">
-                        </div>
-                    </div>
-                    <button onclick="addItemToInvoice()" class="calc-btn w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-indigo-200 transition-all">
-                        <i data-lucide="plus-circle" class="w-5 h-5"></i> فہرست میں شامل کریں
-                    </button>
-                </div>
-            </div>
-
-            <!-- اضافی ڈسکاؤنٹ اور نقد ادائیگی -->
-            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-                <h2 class="text-lg font-bold text-purple-700 flex items-center gap-2 mb-4 border-b pb-2">
-                    <i data-lucide="wallet" class="w-5 h-5"></i> فائنل کٹوتی و وصولی
-                </h2>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-slate-500 mb-1">خاص ڈسکاؤنٹ (روپے)</label>
-                        <input type="number" id="billDiscount" oninput="updateCalculations()" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-purple-500 focus:bg-white text-sm transition-all text-center font-bold text-emerald-600">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-500 mb-1">وصول شدہ رقم (کیش)</label>
-                        <input type="number" id="billPaid" oninput="updateCalculations()" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-purple-500 focus:bg-white text-sm transition-all text-center font-bold text-indigo-600">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- دایاں حصہ: لائیو بل ویو اور ایکشنز (7 کالم) -->
-        <section class="lg:col-span-7 flex flex-col space-y-4">
-            <div id="live-bill-container" class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex-grow flex flex-col justify-between min-h-[450px]">
-                <div>
-                    <!-- اندرونی بل ہیڈر -->
-                    <div class="flex justify-between items-start border-b-2 border-dashed border-slate-200 pb-4 mb-4">
-                        <div>
-                            <h3 class="heading-urdu text-2xl font-bold text-slate-800">نیو قاری ہوزری سٹور</h3>
-                            <p class="text-xs text-slate-400">ہول سیل مارکیٹ، فیصل آباد، پاکستان</p>
-                        </div>
-                        <div class="text-left text-xs text-slate-500 space-y-0.5">
-                            <div><span class="font-bold">بل نمبر:</span> <span id="bill-id-view">---</span></div>
-                            <div><span class="font-bold">تاریخ:</span> <span id="bill-date-view">--/--/----</span></div>
-                        </div>
-                    </div>
-
-                    <!-- کسٹمر لائیو ڈیٹا لائن -->
-                    <div class="bg-slate-50 rounded-xl p-3 mb-4 text-sm grid grid-cols-2 gap-2 border border-slate-100">
-                        <div><span class="text-slate-400">بنام:</span> <span id="lblCustName" class="font-bold text-slate-700">عمومی گاہک</span></div>
-                        <div><span class="text-slate-400">رابطہ/شہر:</span> <span id="lblCustPhone" class="font-bold text-slate-700">---</span></div>
-                    </div>
-
-                    <!-- مال کی ٹیبل -->
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right text-sm">
-                            <thead>
-                                <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
-                                    <th class="py-2.5 px-3 rounded-r-lg">آئٹم کی تفصیل</th>
-                                    <th class="py-2.5 px-2 text-center">تعداد (درجن)</th>
-                                    <th class="py-2.5 px-2 text-center">ریٹ</th>
-                                    <th class="py-2.5 px-3 text-left rounded-l-lg">کل رقم</th>
-                                    <th class="py-2.5 px-2 text-center no-print">حذف</th>
-                                </tr>
-                            </thead>
-                            <tbody id="invoiceItemsBody" class="divide-y divide-slate-100">
-                                <!-- ڈیٹا جاوا اسکرپٹ سے آئے گا -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- بل کے فائنل ٹوٹلز -->
-                <div class="border-t-2 border-dashed border-slate-200 pt-4 mt-6 space-y-2">
-                    <div class="flex justify-between text-sm text-slate-600">
-                        <span>ٹوٹل مال رقم:</span>
-                        <span class="font-bold"><span id="lblSubTotal">0</span> روپے</span>
-                    </div>
-                    <div class="flex justify-between text-sm text-emerald-600">
-                        <span>خصوصی ڈسکاؤنٹ (-):</span>
-                        <span class="font-bold"><span id="lblDiscount">0</span> روپے</span>
-                    </div>
-                    <div class="flex justify-between text-lg font-bold text-indigo-900 bg-indigo-50/70 p-2.5 rounded-xl px-4">
-                        <span>قابلِ ادائیگی کل رقم:</span>
-                        <span><span id="lblGrandTotal">0</span> روپے</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 text-xs text-slate-500 pt-1 px-1">
-                        <div>وصول شدہ کیش: <span class="font-bold text-slate-700" id="lblPaidAmount">0</span> روپے</div>
-                        <div class="text-left">باقی بقایا رقم: <span class="font-bold text-pink-600" id="lblBalanceAmount">0</span> روپے</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ایکشن بٹنز مینو -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button onclick="printInvoice()" class="calc-btn bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-emerald-100 transition-all">
-                    <i data-lucide="printer" class="w-5 h-5"></i> بل پرنٹ کریں
-                </button>
-                <button onclick="downloadInvoiceImage()" class="calc-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-purple-100 transition-all">
-                    <i data-lucide="image" class="w-5 h-5"></i> تصویر ڈاؤنلوڈ کریں
-                </button>
-                <button onclick="saveInvoiceToCloud()" class="calc-btn bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-pink-100 transition-all">
-                    <i data-lucide="cloud-lightning" class="w-5 h-5"></i> کلاؤڈ پر محفوظ کریں
-                </button>
-            </div>
-        </section>
-    </main>
-
-    <!-- 🖨️ پرنٹ کا خوبصورت اور فول پروف خفیہ سانچہ -->
-    <div id="perfect-print-area">
-        <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
-            <h1 style="font-size: 36px; font-weight: bold; margin: 0; color: #000;">نیو قاری ہوزری سٹور</h1>
-            <p style="font-size: 14px; margin: 5px 0 0 0;">ہول سیل مارکیٹ، فیصل آباد | فون: کاروباری ریکارڈ کاپی</p>
-        </div>
-        
-        <table style="width: 100%; font-size: 14px; margin-bottom: 15px; border: 1px solid #ddd; padding: 8px; border-radius: 6px;">
-            <tr>
-                <td style="width: 50%;"><strong>کسٹمر نام:</strong> <span id="ptrCustName"></span></td>
-                <td style="width: 50%; text-align: left;"><strong>بل نمبر:</strong> <span id="ptrBillId"></span></td>
-            </tr>
-            <tr>
-                <td style="width: 50%;"><strong>شہر/رابطہ:</strong> <span id="ptrCustPhone"></span></td>
-                <td style="width: 50%; text-align: left;"><strong>تاریخ:</strong> <span id="ptrBillDate"></span></td>
-            </tr>
-        </table>
-
-        <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
-            <thead>
-                <tr style="background-color: #f2f2f2; border-bottom: 2px solid #000;">
-                    <th style="border: 1px solid #ddd; padding: 10px; text-align: right;">آئٹم کی تفصیل</th>
-                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center; width: 15%;">تعداد (درجن)</th>
-                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center; width: 15%;">ریٹ (فی درجن)</th>
-                    <th style="border: 1px solid #ddd; padding: 10px; text-align: left; width: 20%;">کل رقم</th>
-                </tr>
-            </thead>
-            <tbody id="printItemsBody">
-                <!-- جاوا اسکرپٹ سے پرنٹ ایبل آئٹمز لوڈ ہوں گے -->
-            </tbody>
-        </table>
-
-        <div style="width: 40%; margin-right: auto; font-size: 14px; space-y: 5px;">
-            <div style="display: flex; justify-content: space-between; padding: 3px 0;">
-                <span>ٹوٹل رقم:</span> <span id="ptrSubTotal">0</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 3px 0; color: green;">
-                <span>ڈسکاؤنٹ (-):</span> <span id="ptrDiscount">0</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 5px 0; font-weight: bold; border-top: 1px solid #000; font-size: 16px;">
-                <span>نیٹ ٹوٹل:</span> <span id="ptrGrandTotal">0</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; color: #555;">
-                <span>وصول شدہ:</span> <span id="ptrPaid">0</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; color: #a11;">
-                <span>باقی رقم:</span> <span id="ptrBalance">0</span>
-            </div>
-        </div>
-
-        <div style="margin-top: 50px; text-align: center; font-size: 12px; border-top: 1px dashed #ccc; pt-10px;">
-            <p>خریدے گئے مال کی تبدیلی یا واپسی صرف 7 دنوں کے اندر اصل بل کے ساتھ ممکن ہے۔ شکریہ!</p>
+    <!-- انٹری سیکشن -->
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-sm border mb-6 no-print">
+        <h2 class="text-xl mb-4 font-bold">نئی انٹری درج کریں</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" id="itemName" placeholder="آئٹم کا نام" class="w-full p-3 border rounded-xl outline-none">
+            <input type="number" id="itemQty" placeholder="تعداد" class="w-full p-3 border rounded-xl outline-none">
+            <input type="number" id="itemPrice" placeholder="قیمت" class="w-full p-3 border rounded-xl outline-none">
+            <button onclick="addItem()" class="bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700">شامل کریں</button>
         </div>
     </div>
 
-    <!-- ⚙️ جاوا اسکرپٹ لاجک اور فائر بیس کنکشن -->
-    <script>
-        // فائر بیس کی بنیادی کنفیگریشن (اگر آپ استعمال کر رہے ہیں)
-        const firebaseConfig = {
-            apiKey: "AIzaSyYourKeyHere",
-            authDomain: "new-qari-hosiery.firebaseapp.com",
-            projectId: "new-qari-hosiery",
-            storageBucket: "new-qari-hosiery.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
-        };
+    <!-- بل سیکشن -->
+    <div id="bill-container" class="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-sm border">
+        <div class="text-center mb-6 border-b pb-4">
+            <h2 class="text-2xl font-bold">نیو قاری ہوزری سٹور</h2>
+            <p>قائد اعظم مارکیٹ، فیصل آباد</p>
+            <p>فون: 03065378112</p>
+        </div>
         
-        // فائر بیس کو محفوظ طریقے سے انیشیلائز کرنا
-        try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            var db = firebase.firestore();
-        } catch(e) {
-            console.log("فائر بیس ابھی کنیکٹ نہیں ہے، لوکل سسٹم چالو ہے۔");
-        }
+        <table class="w-full border-collapse text-center">
+            <thead>
+                <tr class="border-b">
+                    <th class="p-2 text-right">آئٹم کی تفصیل</th>
+                    <th class="p-2">تعداد</th>
+                    <th class="p-2">قیمت</th>
+                    <th class="p-2">کل</th>
+                </tr>
+            </thead>
+            <tbody id="cartTable"></tbody>
+        </table>
+        
+        <div class="mt-6 pt-4 border-t text-xl font-bold text-left">
+            گرانڈ ٹوٹل: <span id="grandTotal">0</span> روپے
+        </div>
+        
+        <button onclick="window.print()" class="no-print mt-6 w-full bg-emerald-600 text-white py-3 rounded-xl hover:bg-emerald-700">بل پرنٹ کریں</button>
+    </div>
 
-        // لوکل ویری ایبلز برائے بلنگ ڈیٹا
-        let cartItems = [];
-        let billId = "NQH-" + Math.floor(100000 + Math.random() * 900000);
-        let todayDate = new Date().toLocaleDateString('ur-PK', { day: 'numeric', month: 'long', year: 'numeric' });
-        let standardDate = new Date().toISOString().split('T')[0];
-
-        // پیج لوڈ ہونے پر لائیو سیٹنگز کرنا
-        window.onload = function() {
-            document.getElementById('live-date').innerText = todayDate;
-            document.getElementById('bill-id-view').innerText = billId;
-            document.getElementById('bill-date-view').innerText = standardDate;
+    <script>
+        let total = 0;
+        function addItem() {
+            const name = document.getElementById('itemName').value;
+            const qty = document.getElementById('itemQty').value;
+            const price = document.getElementById('itemPrice').value;
             
-            // لائیو ان پٹ لسنرز لگانا تا کہ کسٹمر کا نام اوپر ساتھ ساتھ تبدیل ہو
-            document.getElementById('custName').addEventListener('input', function() {
-                document.getElementById('lblCustName').innerText = this.value || "عمومی گاہک";
-            });
-            document.getElementById('custPhone').addEventListener('input', function() {
-                document.getElementById('lblCustPhone').innerText = this.value || "---";
-            });
-            
-            lucide.createIcons();
-        };
-
-        // فہرست میں مال کا اندراج کرنا
-        function addItemToInvoice() {
-            const name = document.getElementById('prodName').value.trim();
-            const qty = parseFloat(document.getElementById('prodQty').value);
-            const rate = parseFloat(document.getElementById('prodRate').value);
-
-            if (!name || isNaN(qty) || isNaN(rate) || qty <= 0 || rate <= 0) {
-                alert("براہ کرم آئٹم کا نام، درست تعداد اور ریٹ فراہم کریں!");
-                return;
-            }
-
-            const totalAmount = qty * rate;
-            const item = {
-                id: Date.now(),
-                name: name,
-                qty: qty,
-                rate: rate,
-                total: totalAmount
-            };
-
-            cartItems.push(item);
-            
-            // فیلڈز صاف کریں تاکہ اگلا آئٹم لکھا جا سکے
-            document.getElementById('prodName').value = "";
-            document.getElementById('prodQty').value = "";
-            document.getElementById('prodRate').value = "";
-            
-            updateCalculations();
-            document.getElementById('prodName').focus();
-        }
-
-        // فہرست سے آئٹم حذف کرنا
-        function deleteItem(id) {
-            cartItems = cartItems.filter(item => item.id !== id);
-            updateCalculations();
-        }
-
-        // تمام حسابات کو اپ ڈیٹ کرنا
-        function updateCalculations() {
-            let subTotal = 0;
-            let itemsHtml = "";
-            let printHtml = "";
-
-            cartItems.forEach((item, index) => {
-                subTotal += item.total;
+            if(name && qty && price) {
+                const subTotal = qty * price;
+                total += subTotal;
                 
-                // لائیو ویو کی رو
-                itemsHtml += `
-                    <tr class="hover:bg-slate-50 transition-all">
-                        <td class="py-3 px-3 font-medium text-slate-800">${item.name}</td>
-                        <td class="py-3 px-2 text-center font-bold text-slate-600">${item.qty}</td>
-                        <td class="py-3 px-2 text-center font-bold text-slate-600">${item.rate}</td>
-                        <td class="py-3 px-3 text-left font-bold text-indigo-900">${item.total.toLocaleString()}</td>
-                        <td class="py-3 px-2 text-center no-print">
-                            <button onclick="deleteItem(${item.id})" class="text-rose-500 hover:text-rose-700 transition">
-                                <i data-lucide="trash-2" class="w-4 h-4 mx-auto"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-
-                // پرنٹ ویو کی رو
-                printHtml += `
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: bold;">${item.qty}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: bold;">${item.rate}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: left; font-weight: bold;">${item.total.toLocaleString()}</td>
-                    </tr>
-                `;
-            });
-
-            document.getElementById('invoiceItemsBody').innerHTML = itemsHtml || `<tr><td colspan="5" class="text-center py-8 text-slate-400 text-xs">بل میں کوئی مال شامل نہیں ہے</td></tr>`;
-            document.getElementById('printItemsBody').innerHTML = printHtml || `<tr><td colspan="4" style="text-align:center; padding:20px;">کوئی مال موجود نہیں</td></tr>`;
-
-            // کٹوتی اور ایڈوانس وصولی حاصل کرنا
-            const discount = parseFloat(document.getElementById('billDiscount').value) || 0;
-            const paid = parseFloat(document.getElementById('billPaid').value) || 0;
-            const grandTotal = Math.max(0, subTotal - discount);
-            const balance = grandTotal - paid;
-
-            // اسکرین ویو اپڈیٹ کریں
-            document.getElementById('lblSubTotal').innerText = subTotal.toLocaleString();
-            document.getElementById('lblDiscount').innerText = discount.toLocaleString();
-            document.getElementById('lblGrandTotal').innerText = grandTotal.toLocaleString();
-            document.getElementById('lblPaidAmount').innerText = paid.toLocaleString();
-            document.getElementById('lblBalanceAmount').innerText = balance.toLocaleString();
-
-            // آئیکنز دوبارہ رینڈر کریں
-            lucide.createIcons();
-        }
-
-        // 🖨️ پرنٹ فنکشن
-        function printInvoice() {
-            if(cartItems.length === 0) {
-                alert("خالی بل پرنٹ نہیں کیا جا سکتا!");
-                return;
-            }
-
-            // پرنٹ ایریا کا ڈیٹا سنک کرنا
-            document.getElementById('ptrCustName').innerText = document.getElementById('custName').value || "عمومی گاہک";
-            document.getElementById('ptrCustPhone').innerText = document.getElementById('custPhone').value || "---";
-            document.getElementById('ptrBillId').innerText = billId;
-            document.getElementById('ptrBillDate').innerText = standardDate;
-            
-            document.getElementById('ptrSubTotal').innerText = document.getElementById('lblSubTotal').innerText + " روپے";
-            document.getElementById('ptrDiscount').innerText = document.getElementById('lblDiscount').innerText + " روپے";
-            document.getElementById('ptrGrandTotal').innerText = document.getElementById('lblGrandTotal').innerText + " روپے";
-            document.getElementById('ptrPaid').innerText = document.getElementById('lblPaidAmount').innerText + " روپے";
-            document.getElementById('ptrBalance').innerText = document.getElementById('lblBalanceAmount').innerText + " روپے";
-
-            window.print();
-        }
-
-        // 📸 بل امیج ڈاؤنلوڈ کرنا (واٹس ایپ شیئرنگ کے لیے بہترین)
-        function downloadInvoiceImage() {
-            const billContainer = document.getElementById('live-bill-container');
-            
-            html2canvas(billContainer, {
-                scale: 2, // ہائی کوالٹی رزلٹ
-                useCORS: true,
-                backgroundColor: "#ffffff"
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${document.getElementById('custName').value || 'Customer'}_${billId}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-        }
-
-        // ☁️ کلاؤڈ پر ڈیٹا اسٹور کرنا (فائر بیس ریکارڈ)
-        function saveInvoiceToCloud() {
-            if(cartItems.length === 0) {
-                alert("محفوظ کرنے کے لیے بل میں کوئی مال ہونا ضروری ہے!");
-                return;
-            }
-
-            const invoiceData = {
-                billId: billId,
-                customerName: document.getElementById('custName').value || "عمومی گاہک",
-                customerPhone: document.getElementById('custPhone').value || "---",
-                date: standardDate,
-                items: cartItems,
-                subTotal: parseFloat(document.getElementById('lblSubTotal').innerText.replace(/,/g, '')),
-                discount: parseFloat(document.getElementById('lblDiscount').innerText.replace(/,/g, '')),
-                grandTotal: parseFloat(document.getElementById('lblGrandTotal').innerText.replace(/,/g, '')),
-                paidAmount: parseFloat(document.getElementById('lblPaidAmount').innerText.replace(/,/g, '')),
-                balanceAmount: parseFloat(document.getElementById('lblBalanceAmount').innerText.replace(/,/g, ''))
-            };
-
-            if(typeof db !== 'undefined') {
-                db.collection("Invoices").doc(billId).set(invoiceData)
-                .then(() => {
-                    alert("🎉 بل کامیابی کے ساتھ نیو قاری ہوزری سٹور کلاؤڈ ڈیٹا بیس میں محفوظ ہو گیا ہے!");
-                })
-                .catch((error) => {
-                    console.error("خرابی: ", error);
-                    alert("کلاؤڈ پر محفوظ کرنے میں مسئلہ آیا، انٹرنیٹ چیک کریں۔ لوکل ڈیٹا محفوظ ہے۔");
-                });
-            } else {
-                alert("حساب لوکل سسٹم پر عارضی محفوظ ہے۔ کلاؤڈ کنکشن کنفیگر ہونا ابھی باقی ہے۔");
+                const row = `<tr>
+                    <td class="p-2 border-b text-right">${name}</td>
+                    <td class="p-2 border-b">${qty}</td>
+                    <td class="p-2 border-b">${price}</td>
+                    <td class="p-2 border-b">${subTotal}</td>
+                </tr>`;
+                
+                document.getElementById('cartTable').innerHTML += row;
+                document.getElementById('grandTotal').innerText = total;
+                
+                // فیلڈز صاف کریں
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemQty').value = '';
+                document.getElementById('itemPrice').value = '';
             }
         }
     </script>
