@@ -17,7 +17,7 @@
         <h2 class="text-center font-bold text-xl">نیو قاری ہوزری سٹور</h2>
         <div class="mt-2">کسٹمر: <span id="displayCustName">-------</span></div>
         <table class="w-full mt-2 border text-sm text-center">
-            <tr class="bg-gray-200"><th>آئٹم</th><th>تعداد</th><th>کل</th></tr>
+            <tr class="bg-gray-200"><th>آئٹم</th><th>تعداد</th><th>قیمت</th><th>کل</th></tr>
             <tbody id="cartTable"></tbody>
         </table>
         <div class="mt-2 border-t pt-1 text-sm">
@@ -80,7 +80,7 @@
             if(item && qty > 0 && price > 0) {
                 let total = qty * price;
                 subTotal += total;
-                document.getElementById('cartTable').innerHTML += `<tr><td>${item}</td><td>${qty}</td><td>${total}</td></tr>`;
+                document.getElementById('cartTable').innerHTML += `<tr><td>${item}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
                 document.getElementById('subTotalDisplay').innerText = subTotal;
                 calculateTotal();
             } else {
