@@ -12,21 +12,23 @@
 </head>
 <body class="bg-gray-100 p-2">
 
+    <!-- بل کا حصہ -->
     <div id="bill-container" class="max-w-md mx-auto bg-white p-4 rounded shadow">
         <h2 class="text-center font-bold text-xl">نیو قاری ہوزری سٹور</h2>
         <div class="mt-2">کسٹمر: <span id="displayCustName">-------</span></div>
-        <table class="w-full mt-2 border text-sm">
+        <table class="w-full mt-2 border text-sm text-center">
             <tr class="bg-gray-200"><th>آئٹم</th><th>تعداد</th><th>کل</th></tr>
-            <tbody id="cartTable" class="text-center"></tbody>
+            <tbody id="cartTable"></tbody>
         </table>
         <div class="mt-2 border-t pt-1 text-sm">
             <p>سب ٹوٹل: <span id="subTotalDisplay">0</span></p>
             <p>سابقہ بقایا: <span id="prevBalanceDisplay">0</span></p>
             <p>جمع شدہ: <span id="paidAmountDisplay">0</span></p>
-            <p class="font-bold">ٹوٹل بقایا: <span id="grandTotal">0</span></p>
+            <p class="font-bold text-lg">ٹوٹل بقایا: <span id="grandTotal">0</span></p>
         </div>
     </div>
 
+    <!-- انٹری کا حصہ -->
     <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-4">
         <input type="text" id="custNameInput" placeholder="کسٹمر کا نام">
         
@@ -35,9 +37,19 @@
             <option value="مردانہ جراب">مردانہ جراب</option>
             <option value="لیڈی جراب">لیڈی جراب</option>
             <option value="بچہ جراب">بچہ جراب</option>
+            <option value="مردانہ جراب چائنا">مردانہ جراب چائنا</option>
+            <option value="لیڈی جراب چائنا">لیڈی جراب چائنا</option>
+            <option value="بچہ جراب چائنا">بچہ جراب چائنا</option>
             <option value="موزہ">موزہ</option>
+            <option value="موزہ چائنا">موزہ چائنا</option>
             <option value="ٹوپی">ٹوپی</option>
             <option value="دستانہ">دستانہ</option>
+            <option value="ہائی نیک">ہائی نیک</option>
+            <option value="پاجامہ">پاجامہ</option>
+            <option value="کیپ">کیپ</option>
+            <option value="رومال">رومال</option>
+            <option value="ناڑہ">ناڑہ</option>
+            <option value="پرنہ">پرنہ</option>
             <option value="بنیان">بنیان</option>
         </select>
 
@@ -49,6 +61,7 @@
         <input type="number" id="paidAmount" placeholder="جمع شدہ رقم" oninput="calculateTotal()">
     </div>
 
+    <!-- پرنٹ اور واٹس ایپ بٹنز -->
     <div class="max-w-md mx-auto mt-4 grid grid-cols-2 gap-2">
         <button onclick="window.print()" class="bg-green-600 text-white py-2 rounded font-bold">پرنٹ کریں</button>
         <button onclick="downloadBillImage()" class="bg-pink-600 text-white py-2 rounded font-bold">واٹس ایپ تصویر</button>
@@ -61,13 +74,17 @@
             const item = document.getElementById('itemName').value;
             const qty = parseFloat(document.getElementById('itemQty').value) || 0;
             const price = parseFloat(document.getElementById('itemPrice').value) || 0;
+            
             if(name) document.getElementById('displayCustName').innerText = name;
+            
             if(item && qty > 0 && price > 0) {
                 let total = qty * price;
                 subTotal += total;
                 document.getElementById('cartTable').innerHTML += `<tr><td>${item}</td><td>${qty}</td><td>${total}</td></tr>`;
                 document.getElementById('subTotalDisplay').innerText = subTotal;
                 calculateTotal();
+            } else {
+                alert("براہ کرم آئٹم، تعداد اور قیمت درست منتخب/درج کریں۔");
             }
         }
         function calculateTotal() {
@@ -80,7 +97,7 @@
         function downloadBillImage() {
             html2canvas(document.getElementById('bill-container')).then(c => {
                 const link = document.createElement('a');
-                link.download = 'Bill.png';
+                link.download = 'New-Qari-Hosiery-Bill.png';
                 link.href = c.toDataURL("image/png");
                 link.click();
             });
