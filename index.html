@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        input { font-size: 16px !important; color: #000 !important; border: 2px solid #333 !important; padding: 10px !important; width: 100% !important; margin-top: 5px !important; }
+        input, select { font-size: 16px !important; color: #000 !important; border: 2px solid #333 !important; padding: 10px !important; width: 100% !important; margin-top: 5px !important; }
     </style>
 </head>
 <body class="bg-gray-100 p-2">
@@ -29,6 +29,18 @@
 
     <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-4">
         <input type="text" id="custNameInput" placeholder="کسٹمر کا نام">
+        
+        <select id="itemName">
+            <option value="">پروڈکٹ منتخب کریں</option>
+            <option value="مردانہ جراب">مردانہ جراب</option>
+            <option value="لیڈی جراب">لیڈی جراب</option>
+            <option value="بچہ جراب">بچہ جراب</option>
+            <option value="موزہ">موزہ</option>
+            <option value="ٹوپی">ٹوپی</option>
+            <option value="دستانہ">دستانہ</option>
+            <option value="بنیان">بنیان</option>
+        </select>
+
         <input type="number" id="itemQty" placeholder="تعداد">
         <input type="number" id="itemPrice" placeholder="قیمت">
         <button onclick="addItem()" class="w-full bg-blue-600 text-white py-2 mt-3 font-bold">آئٹم شامل کریں</button>
@@ -46,13 +58,14 @@
         let subTotal = 0;
         function addItem() {
             const name = document.getElementById('custNameInput').value;
+            const item = document.getElementById('itemName').value;
             const qty = parseFloat(document.getElementById('itemQty').value) || 0;
             const price = parseFloat(document.getElementById('itemPrice').value) || 0;
             if(name) document.getElementById('displayCustName').innerText = name;
-            if(qty > 0 && price > 0) {
+            if(item && qty > 0 && price > 0) {
                 let total = qty * price;
                 subTotal += total;
-                document.getElementById('cartTable').innerHTML += `<tr><td>آئٹم</td><td>${qty}</td><td>${total}</td></tr>`;
+                document.getElementById('cartTable').innerHTML += `<tr><td>${item}</td><td>${qty}</td><td>${total}</td></tr>`;
                 document.getElementById('subTotalDisplay').innerText = subTotal;
                 calculateTotal();
             }
