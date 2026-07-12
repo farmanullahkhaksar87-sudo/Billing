@@ -37,7 +37,7 @@
             <input type="text" id="custNameInput" placeholder="کسٹمر کا نام" class="w-full p-3 border rounded-xl outline-none col-span-2">
             
             <select id="itemName" class="w-full p-3 border rounded-xl outline-none bg-white">
-                <option value="">پروڈکٹ منتخب کریں</option>
+                <option value="">پروڈکٹ منتخب کریں (اگر فہرست میں ہے)</option>
                 <option value="مردانہ جراب">مردانہ جراب</option>
                 <option value="لیڈی جراب">لیڈی جراب</option>
                 <option value="بچہ جراب">بچہ جراب</option>
@@ -57,8 +57,7 @@
                 <option value="بنیان">بنیان</option>
             </select>
 
-            <!-- مزید معلومات کا خانہ -->
-            <input type="text" id="itemDetails" placeholder="مزید معلومات یا نیا پروڈکٹ" class="w-full p-3 border rounded-xl outline-none">
+            <input type="text" id="itemDetails" placeholder="مزید معلومات یا نیا پروڈکٹ کا نام" class="w-full p-3 border rounded-xl outline-none">
             
             <input type="number" id="itemQty" placeholder="تعداد" class="w-full p-3 border rounded-xl outline-none">
             <input type="number" id="itemPrice" placeholder="قیمت" class="w-full p-3 border rounded-xl outline-none">
@@ -106,30 +105,43 @@
             const qty = document.getElementById('itemQty').value;
             const price = document.getElementById('itemPrice').value;
             
+            // Validation: چیک کریں کہ آیا کم از کم کوئی ایک پروڈکٹ کا نام/تفصیل موجود ہے
+            if (!selectName && !extraDetails) {
+                alert("براہ کرم پروڈکٹ منتخب کریں یا نیا نام درج کریں۔");
+                return;
+            }
+            if (!qty || !price) {
+                alert("تعداد اور قیمت درج کرنا لازمی ہے۔");
+                return;
+            }
+
             if(custName) document.getElementById('displayCustName').innerText = custName;
             
-            // اگر منتخب کردہ نام اور مزید معلومات دونوں ہیں تو انہیں جوڑ دیں
-            const finalItemName = selectName + (extraDetails ? " (" + extraDetails + ")" : "");
-            
-            if((selectName || extraDetails) && qty && price) {
-                const subTotal = qty * price;
-                total += subTotal;
-                
-                const row = `<tr>
-                    <td class="p-2 border-b text-right">${finalItemName}</td>
-                    <td class="p-2 border-b">${qty}</td>
-                    <td class="p-2 border-b">${price}</td>
-                    <td class="p-2 border-b">${subTotal}</td>
-                </tr>`;
-                
-                document.getElementById('cartTable').innerHTML += row;
-                document.getElementById('grandTotal').innerText = total;
-                
-                // فیلڈز کو صاف کریں
-                document.getElementById('itemDetails').value = '';
-                document.getElementById('itemQty').value = '';
-                document.getElementById('itemPrice').value = '';
+            // پروڈکٹ کا حتمی نام بنانا
+            let finalName = selectName;
+            if (extraDetails) {
+                finalName = finalName ? `${finalName} - ${extraDetails}` : extraDetails;
             }
+            
+            const subTotal = qty * price;
+            total += parseInt(subTotal);
+            
+            // ٹیبل میں لائن شامل کرنا
+            const row = `<tr>
+                <td class="p-2 border-b text-right">${finalName}</td>
+                <td class="p-2 border-b">${qty}</td>
+                <td class="p-2 border-b">${price}</td>
+                <td class="p-2 border-b">${subTotal}</td>
+            </tr>`;
+            
+            document.getElementById('cartTable').insertAdjacentHTML('beforeend', row);
+            document.getElementById('grandTotal').innerText = total;
+            
+            // فیلڈز کو صاف کرنا
+            document.getElementById('itemDetails').value = '';
+            document.getElementById('itemQty').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemName').value = '';
         }
 
         function downloadBillImage() {
