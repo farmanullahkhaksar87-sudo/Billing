@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نیو قاری ہوزری سٹور - بلنگ سسٹم</title>
+    <title>نیو قاری ہوزری سٹور</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
@@ -11,12 +11,19 @@
         @font-face {
             font-family: 'Jameel Noori Nastaleeq';
             src: url('https://font.urdufonts.net/download.php?id=jameel-noori-nastaleeq-regular') format('truetype');
-            font-display: swap;
         }
+        /* ان پٹ خانوں کو واضح کرنے کے لیے سٹائل */
         body, input, select, button, span, th, td, h1, p, h2, label {
             font-family: 'Jameel Noori Nastaleeq', serif !important;
-            color: #1e293b !important;
         }
+        input, select {
+            color: #000000 !important; /* لکھائی کا رنگ کالا */
+            font-size: 18px !important; /* لکھائی کا سائز بڑا */
+            font-weight: bold !important;
+            border: 2px solid #6366f1 !important; /* بارڈر کو نمایاں کیا */
+        }
+        ::placeholder { color: #64748b !important; }
+        
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; }
@@ -25,16 +32,18 @@
 </head>
 <body class="bg-slate-100 p-4">
 
-    <header class="bg-indigo-700 text-white p-6 rounded-2xl shadow-lg text-center mb-6 no-print">
+    <!-- ہیڈر -->
+    <header class="bg-indigo-700 text-white p-6 rounded-2xl text-center mb-6 no-print">
         <h1 class="text-3xl font-bold">نیو قاری ہوزری سٹور</h1>
-        <p>قائد اعظم مارکیٹ، فیصل آباد | فون: 03065378112</p>
     </header>
 
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-sm border mb-6 no-print">
-        <h2 class="text-xl mb-4 font-bold text-slate-800">نئی انٹری درج کریں</h2>
+    <!-- انٹری سیکشن -->
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl border mb-6 no-print">
+        <h2 class="text-xl mb-4 font-bold text-slate-800">تفصیل درج کریں</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" id="custNameInput" placeholder="کسٹمر کا نام" class="w-full p-3 border rounded-xl outline-none col-span-2">
-            <select id="itemName" class="w-full p-3 border rounded-xl outline-none">
+            <input type="text" id="custNameInput" placeholder="کسٹمر کا نام" class="w-full p-4 rounded-xl outline-none col-span-2">
+            
+            <select id="itemName" class="w-full p-4 rounded-xl outline-none">
                 <option value="">پروڈکٹ منتخب کریں</option>
                 <option value="مردانہ جراب">مردانہ جراب</option>
                 <option value="لیڈی جراب">لیڈی جراب</option>
@@ -42,45 +51,39 @@
                 <option value="موزہ">موزہ</option>
                 <option value="ٹوپی">ٹوپی</option>
                 <option value="دستانہ">دستانہ</option>
+                <option value="ہائی نیک">ہائی نیک</option>
+                <option value="پاجامہ">پاجامہ</option>
                 <option value="بنیان">بنیان</option>
             </select>
-            <input type="text" id="itemDetails" placeholder="تفصیل" class="w-full p-3 border rounded-xl outline-none">
-            <input type="number" id="itemQty" placeholder="تعداد" class="w-full p-3 border rounded-xl outline-none">
-            <input type="number" id="itemPrice" placeholder="قیمت" class="w-full p-3 border rounded-xl outline-none">
-            <button onclick="addItem()" class="bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 col-span-2">آئٹم شامل کریں</button>
             
-            <hr class="col-span-2">
+            <input type="text" id="itemDetails" placeholder="مزید معلومات" class="w-full p-4 rounded-xl outline-none">
+            <input type="number" id="itemQty" placeholder="تعداد" class="w-full p-4 rounded-xl outline-none">
+            <input type="number" id="itemPrice" placeholder="قیمت" class="w-full p-4 rounded-xl outline-none">
             
-            <input type="number" id="prevBalance" placeholder="سابقہ بقایا" class="w-full p-3 border rounded-xl outline-none" oninput="calculateTotal()">
-            <input type="number" id="paidAmount" placeholder="جمع شدہ رقم" class="w-full p-3 border rounded-xl outline-none" oninput="calculateTotal()">
+            <button onclick="addItem()" class="bg-indigo-600 text-white py-4 rounded-xl hover:bg-indigo-700 col-span-2 font-bold text-lg">آئٹم شامل کریں</button>
+            
+            <!-- کسٹمر کھاتہ -->
+            <input type="number" id="prevBalance" placeholder="سابقہ بقایا" class="w-full p-4 rounded-xl outline-none border-red-500" oninput="calculateTotal()">
+            <input type="number" id="paidAmount" placeholder="جمع شدہ رقم" class="w-full p-4 rounded-xl outline-none border-green-500" oninput="calculateTotal()">
         </div>
     </div>
 
-    <div id="bill-container" class="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-sm border">
-        <div class="text-center mb-6 border-b pb-4">
-            <h2 class="text-2xl font-bold">نیو قاری ہوزری سٹور</h2>
-            <p>قائد اعظم مارکیٹ، فیصل آباد | 03065378112</p>
-            <div class="mt-2 text-right font-bold">کسٹمر: <span id="displayCustName">-------</span></div>
-        </div>
-        
+    <!-- بل -->
+    <div id="bill-container" class="max-w-2xl mx-auto bg-white p-6 rounded-2xl border">
+        <h2 class="text-2xl font-bold text-center mb-4">نیو قاری ہوزری سٹور</h2>
+        <div class="text-right font-bold mb-4">کسٹمر: <span id="displayCustName">-------</span></div>
         <table class="w-full border-collapse text-center">
-            <thead>
-                <tr class="border-b"><th class="p-2 text-right">آئٹم</th><th class="p-2">تعداد</th><th class="p-2">قیمت</th><th class="p-2">کل</th></tr>
+            <thead class="bg-slate-100">
+                <tr><th class="p-2 border">آئٹم</th><th class="p-2 border">تعداد</th><th class="p-2 border">قیمت</th><th class="p-2 border">کل</th></tr>
             </thead>
             <tbody id="cartTable"></tbody>
         </table>
-        
-        <div class="mt-6 pt-4 border-t text-xl font-bold">
+        <div class="mt-4 pt-2 border-t text-lg font-bold">
             <p>سب ٹوٹل: <span id="subTotalDisplay">0</span></p>
             <p>سابقہ بقایا: <span id="prevBalanceDisplay">0</span></p>
-            <p class="text-red-600">جمع شدہ رقم: <span id="paidAmountDisplay">0</span></p>
-            <p class="text-2xl mt-2 border-t pt-2">ٹوٹل بقایا: <span id="grandTotal">0</span></p>
+            <p>جمع شدہ: <span id="paidAmountDisplay">0</span></p>
+            <p class="text-xl mt-2 text-indigo-700">ٹوٹل بقایا: <span id="grandTotal">0</span></p>
         </div>
-    </div>
-
-    <div class="max-w-2xl mx-auto mt-6 no-print grid grid-cols-2 gap-4">
-        <button onclick="window.print()" class="bg-emerald-600 text-white py-3 rounded-xl">پرنٹ کریں</button>
-        <button onclick="downloadBillImage()" class="bg-pink-600 text-white py-3 rounded-xl">تصویر بنائیں</button>
     </div>
 
     <script>
@@ -96,27 +99,17 @@
             if(item && qty && price) {
                 let total = qty * price;
                 subTotal += total;
-                document.getElementById('cartTable').innerHTML += `<tr><td class="p-2 border-b text-right">${item} ${det}</td><td class="p-2 border-b">${qty}</td><td class="p-2 border-b">${price}</td><td class="p-2 border-b">${total}</td></tr>`;
+                document.getElementById('cartTable').innerHTML += `<tr><td class="p-2 border">${item} ${det}</td><td class="p-2 border">${qty}</td><td class="p-2 border">${price}</td><td class="p-2 border">${total}</td></tr>`;
                 document.getElementById('subTotalDisplay').innerText = subTotal;
                 calculateTotal();
             }
         }
-
         function calculateTotal() {
             const prev = parseInt(document.getElementById('prevBalance').value) || 0;
             const paid = parseInt(document.getElementById('paidAmount').value) || 0;
             document.getElementById('prevBalanceDisplay').innerText = prev;
             document.getElementById('paidAmountDisplay').innerText = paid;
             document.getElementById('grandTotal').innerText = (subTotal + prev) - paid;
-        }
-
-        function downloadBillImage() {
-            html2canvas(document.getElementById('bill-container')).then(c => {
-                const link = document.createElement('a');
-                link.download = 'Bill.png';
-                link.href = c.toDataURL();
-                link.click();
-            });
         }
     </script>
 </body>
