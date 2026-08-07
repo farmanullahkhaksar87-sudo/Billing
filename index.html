@@ -41,7 +41,7 @@
         /* پرنٹ کے لیے خصوصی سیٹنگز */
         @media print {
             body { background: white !important; padding: 0 !important; margin: 0 !important; }
-            .no-print { display: none !important; } /* بل کے علاوہ باقی تمام حصے چھپ جائیں گے */
+            .no-print { display: none !important; }
             #bill-container { 
                 box-shadow: none !important; 
                 border: none !important; 
@@ -57,19 +57,35 @@
 
     <!-- بل کا حصہ (صرف یہی پرنٹ ہوگا) -->
     <div id="bill-container" class="max-w-md mx-auto bg-white p-4 rounded shadow">
-        <h2 class="text-center font-bold text-xl">نیو قاری ہوزری سٹور</h2>
-        <div class="mt-2">کسٹمر: <span id="displayCustName">-------</span></div>
+        <!-- ہیڈر اور رابطہ کی معلومات -->
+        <h2 class="text-center font-bold text-2xl">نیو قاری ہوزری سٹور</h2>
+        <p class="text-center text-xs text-gray-700 mt-1">نزد مبارک مسجد قائد اعظم مارکیٹ فیصل آباد</p>
+        <p class="text-center text-sm font-bold text-gray-800 mt-1" dir="ltr">📱 0306-5378112</p>
+
+        <div class="mt-3 border-t pt-2 flex justify-between text-sm">
+            <div>کسٹمر: <span id="displayCustName" class="font-bold">-------</span></div>
+            <div id="billDateDisplay" class="text-xs text-gray-600"></div>
+        </div>
+
         <table class="w-full mt-2 border text-sm text-center">
             <thead>
                 <tr class="bg-gray-200"><th>آئٹم / تفصیل</th><th>تعداد</th><th>قیمت</th><th>کل</th></tr>
             </thead>
             <tbody id="cartTable"></tbody>
         </table>
+
         <div class="mt-2 border-t pt-1 text-sm">
             <p>سب ٹوٹل: <span id="subTotalDisplay">0</span></p>
             <p>سابقہ بقایا: <span id="prevBalanceDisplay">0</span></p>
             <p>جمع شدہ: <span id="paidAmountDisplay">0</span></p>
             <p class="font-bold text-lg">ٹوٹل بقایا: <span id="grandTotal">0</span></p>
+        </div>
+
+        <!-- بینک تفصیلات سیکشن -->
+        <div class="mt-3 border-t pt-2 bg-gray-50 p-2 rounded text-xs text-center">
+            <p class="font-bold text-gray-700 mb-1">🏦 میزان بینک (Meezan Bank)</p>
+            <p dir="ltr" class="font-mono text-sm font-bold text-blue-900">4301.0101787698</p>
+            <p class="text-gray-800 font-semibold mt-0.5">Farmanullah</p>
         </div>
     </div>
 
@@ -157,6 +173,7 @@
         let allBillsData = [];
 
         window.onload = function() {
+            document.getElementById('billDateDisplay').innerText = new Date().toLocaleDateString('en-GB');
             setTimeout(loadBillsFromFirebase, 1000);
         };
 
