@@ -37,11 +37,25 @@
 
     <style>
         input, select { font-size: 16px !important; color: #000 !important; border: 2px solid #333 !important; padding: 10px !important; width: 100% !important; margin-top: 5px !important; }
+        
+        /* پرنٹ کے لیے خصوصی سیٹنگز */
+        @media print {
+            body { background: white !important; padding: 0 !important; margin: 0 !important; }
+            .no-print { display: none !important; } /* بل کے علاوہ باقی تمام حصے چھپ جائیں گے */
+            #bill-container { 
+                box-shadow: none !important; 
+                border: none !important; 
+                width: 100% !important; 
+                max-width: 100% !important; 
+                padding: 0 !important; 
+                margin: 0 !important; 
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-2 pb-20">
 
-    <!-- بل کا حصہ -->
+    <!-- بل کا حصہ (صرف یہی پرنٹ ہوگا) -->
     <div id="bill-container" class="max-w-md mx-auto bg-white p-4 rounded shadow">
         <h2 class="text-center font-bold text-xl">نیو قاری ہوزری سٹور</h2>
         <div class="mt-2">کسٹمر: <span id="displayCustName">-------</span></div>
@@ -59,8 +73,8 @@
         </div>
     </div>
 
-    <!-- انٹری کا حصہ -->
-    <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-4">
+    <!-- انٹری کا حصہ (پرنٹ میں نہیں آئے گا) -->
+    <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-4 no-print">
         <input type="text" id="custNameInput" placeholder="کسٹمر کا نام" onchange="fetchCustomerPreviousBalance()">
         
         <select id="itemName">
@@ -84,7 +98,6 @@
             <option value="بنیان">بنیان</option>
         </select>
 
-        <!-- سب کیٹیگری / مزید تفصیل کا خانہ -->
         <input type="text" id="itemDetail" placeholder="سب کیٹیگری / سائز / مزید تفصیل (مثلاً: کاٹن، لارج، ڈبل)">
 
         <input type="number" id="itemQty" placeholder="تعداد">
@@ -97,17 +110,16 @@
         <button onclick="saveBillToFirebase()" class="w-full bg-purple-600 text-white py-2 mt-3 font-bold">بل محفوظ کریں (Firebase)</button>
     </div>
 
-    <!-- پرنٹ اور واٹس ایپ بٹنز -->
-    <div class="max-w-md mx-auto mt-4 grid grid-cols-2 gap-2">
+    <!-- پرنٹ اور واٹس ایپ بٹنز (پرنٹ میں نہیں آئیں گے) -->
+    <div class="max-w-md mx-auto mt-4 grid grid-cols-2 gap-2 no-print">
         <button onclick="window.print()" class="bg-green-600 text-white py-2 rounded font-bold">پرنٹ کریں</button>
         <button onclick="downloadBillImage()" class="bg-pink-600 text-white py-2 rounded font-bold">واٹس ایپ تصویر</button>
     </div>
 
-    <!-- سابقہ بلوں کا ریکارڈ اور رپورٹ کا سیکشن -->
-    <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-6">
+    <!-- سابقہ بلوں کا ریکارڈ اور رپورٹ کا سیکشن (پرنٹ میں نہیں آئے گا) -->
+    <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-6 no-print">
         <h3 class="text-lg font-bold text-center border-b pb-2 mb-3">سابقہ بلوں کا ریکارڈ اور رپورٹ</h3>
 
-        <!-- سیل سمری کارڈز -->
         <div class="grid grid-cols-2 gap-2 mb-4 text-center">
             <div class="bg-green-100 border border-green-400 p-2 rounded">
                 <p class="text-xs text-gray-600 font-bold">کل سیل (Total Sales)</p>
@@ -161,7 +173,6 @@
                 let total = qty * price;
                 subTotal += total;
                 
-                // بل ڈسپلے کا نام تفصیل کے ساتھ
                 let itemDisplayName = detail ? `${item} (${detail})` : item;
 
                 cartItems.push({ item: itemDisplayName, qty, price, total });
