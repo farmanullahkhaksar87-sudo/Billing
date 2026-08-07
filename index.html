@@ -6,6 +6,37 @@
     <title>نیو قاری ہوزری سٹور</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Firebase SDK Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // آپ کی فائر بیس کنفیگریشن
+        const firebaseConfig = {
+            apiKey: "AIzaSyDw27sGFr6hu8MFhKLhYbNz6UDr9drTwHY",
+            authDomain: "billing-calculator-518b6.firebaseapp.com",
+            projectId: "billing-calculator-518b6",
+            storageBucket: "billing-calculator-518b6.firebasestorage.app",
+            messagingSenderId: "565720164322",
+            appId: "1:565720164322:web:1db79154b08e2bc4b57bbb",
+            databaseURL: "https://billing-calculator-518b6-default-rtdb.firebaseio.com"
+        };
+
+        // Firebase Initializing
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Global variables for window scope access
+        window.db = db;
+        window.dbRef = ref(db);
+        window.push = push;
+        window.set = set;
+        window.get = get;
+        window.child = child;
+        window.ref = ref;
+    </script>
+
     <style>
         input, select { font-size: 16px !important; color: #000 !important; border: 2px solid #333 !important; padding: 10px !important; width: 100% !important; margin-top: 5px !important; }
     </style>
@@ -17,7 +48,9 @@
         <h2 class="text-center font-bold text-xl">نیو قاری ہوزری سٹور</h2>
         <div class="mt-2">کسٹمر: <span id="displayCustName">-------</span></div>
         <table class="w-full mt-2 border text-sm text-center">
-            <tr class="bg-gray-200"><th>آئٹم</th><th>تعداد</th><th>قیمت</th><th>کل</th></tr>
+            <thead>
+                <tr class="bg-gray-200"><th>آئٹم</th><th>تعداد</th><th>قیمت</th><th>کل</th></tr>
+            </thead>
             <tbody id="cartTable"></tbody>
         </table>
         <div class="mt-2 border-t pt-1 text-sm">
@@ -30,7 +63,7 @@
 
     <!-- انٹری کا حصہ -->
     <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-4">
-        <input type="text" id="custNameInput" placeholder="کسٹمر کا نام">
+        <input type="text" id="custNameInput" placeholder="کسٹمر کا نام" onchange="fetchCustomerPreviousBalance()">
         
         <select id="itemName">
             <option value="">پروڈکٹ منتخب کریں</option>
@@ -59,6 +92,8 @@
         
         <input type="number" id="prevBalance" placeholder="سابقہ بقایا" oninput="calculateTotal()">
         <input type="number" id="paidAmount" placeholder="جمع شدہ رقم" oninput="calculateTotal()">
+        
+        <button onclick="saveBillToFirebase()" class="w-full bg-purple-600 text-white py-2 mt-3 font-bold">بل محفوظ کریں (Firebase)</button>
     </div>
 
     <!-- پرنٹ اور واٹس ایپ بٹنز -->
@@ -69,8 +104,10 @@
 
     <script>
         let subTotal = 0;
+        let cartItems = [];
+
         function addItem() {
-            const name = document.getElementById('custNameInput').value;
+            const name = document.getElementById('custNameInput').value.trim();
             const item = document.getElementById('itemName').value;
             const qty = parseFloat(document.getElementById('itemQty').value) || 0;
             const price = parseFloat(document.getElementById('itemPrice').value) || 0;
@@ -80,13 +117,22 @@
             if(item && qty > 0 && price > 0) {
                 let total = qty * price;
                 subTotal += total;
+                
+                cartItems.push({ item, qty, price, total });
+
                 document.getElementById('cartTable').innerHTML += `<tr><td>${item}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
                 document.getElementById('subTotalDisplay').innerText = subTotal;
+                
+                document.getElementById('itemName').value = "";
+                document.getElementById('itemQty').value = "";
+                document.getElementById('itemPrice').value = "";
+
                 calculateTotal();
             } else {
                 alert("براہ کرم آئٹم، تعداد اور قیمت درست منتخب/درج کریں۔");
             }
         }
+
         function calculateTotal() {
             const prev = parseFloat(document.getElementById('prevBalance').value) || 0;
             const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
@@ -94,6 +140,63 @@
             document.getElementById('paidAmountDisplay').innerText = paid;
             document.getElementById('grandTotal').innerText = (subTotal + prev) - paid;
         }
+
+        async function saveBillToFirebase() {
+            const customerName = document.getElementById('custNameInput').value.trim();
+            if(!customerName || cartItems.length === 0) {
+                alert("براہ کرم کسٹمر کا نام اور کم از کم ایک آئٹم شامل کریں۔");
+                return;
+            }
+
+            const prevBalance = parseFloat(document.getElementById('prevBalance').value) || 0;
+            const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
+            const grandTotal = (subTotal + prevBalance) - paidAmount;
+
+            const billData = {
+                customerName: customerName,
+                items: cartItems,
+                subTotal: subTotal,
+                prevBalance: prevBalance,
+                paidAmount: paidAmount,
+                grandTotal: grandTotal,
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleDateString('ur-PK')
+            };
+
+            try {
+                // بل محفوظ کرنا
+                const newBillRef = window.push(window.ref(window.db, 'bills'));
+                await window.set(newBillRef, billData);
+
+                // کسٹمر کا آخری بقایا اپڈیٹ کرنا
+                await window.set(window.ref(window.db, 'customers/' + customerName), {
+                    lastBalance: grandTotal,
+                    updatedAt: new Date().toISOString()
+                });
+
+                alert("بل کامیابی سے فائر بیس پر محفوظ ہو گیا ہے!");
+            } catch (error) {
+                console.error("Firebase Error: ", error);
+                alert("ڈیٹا محفوظ کرتے وقت خرابی پیش آئی: " + error.message);
+            }
+        }
+
+        async function fetchCustomerPreviousBalance() {
+            const customerName = document.getElementById('custNameInput').value.trim();
+            if(!customerName) return;
+
+            try {
+                const snapshot = await window.get(window.child(window.dbRef, `customers/${customerName}`));
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    document.getElementById('prevBalance').value = data.lastBalance || 0;
+                    calculateTotal();
+                }
+            } catch (error) {
+                console.error("Error fetching balance:", error);
+            }
+        }
+
         function downloadBillImage() {
             html2canvas(document.getElementById('bill-container')).then(c => {
                 const link = document.createElement('a');
