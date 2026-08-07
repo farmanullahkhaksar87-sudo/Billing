@@ -47,7 +47,7 @@
         <div class="mt-2">کسٹمر: <span id="displayCustName">-------</span></div>
         <table class="w-full mt-2 border text-sm text-center">
             <thead>
-                <tr class="bg-gray-200"><th>آئٹم</th><th>تعداد</th><th>قیمت</th><th>کل</th></tr>
+                <tr class="bg-gray-200"><th>آئٹم / تفصیل</th><th>تعداد</th><th>قیمت</th><th>کل</th></tr>
             </thead>
             <tbody id="cartTable"></tbody>
         </table>
@@ -83,6 +83,9 @@
             <option value="پرنہ">پرنہ</option>
             <option value="بنیان">بنیان</option>
         </select>
+
+        <!-- سب کیٹیگری / مزید تفصیل کا خانہ -->
+        <input type="text" id="itemDetail" placeholder="سب کیٹیگری / سائز / مزید تفصیل (مثلاً: کاٹن، لارج، ڈبل)">
 
         <input type="number" id="itemQty" placeholder="تعداد">
         <input type="number" id="itemPrice" placeholder="قیمت">
@@ -148,6 +151,7 @@
         function addItem() {
             const name = document.getElementById('custNameInput').value.trim();
             const item = document.getElementById('itemName').value;
+            const detail = document.getElementById('itemDetail').value.trim();
             const qty = parseFloat(document.getElementById('itemQty').value) || 0;
             const price = parseFloat(document.getElementById('itemPrice').value) || 0;
             
@@ -157,12 +161,16 @@
                 let total = qty * price;
                 subTotal += total;
                 
-                cartItems.push({ item, qty, price, total });
+                // بل ڈسپلے کا نام تفصیل کے ساتھ
+                let itemDisplayName = detail ? `${item} (${detail})` : item;
 
-                document.getElementById('cartTable').innerHTML += `<tr><td>${item}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
+                cartItems.push({ item: itemDisplayName, qty, price, total });
+
+                document.getElementById('cartTable').innerHTML += `<tr><td class="text-right px-1">${itemDisplayName}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
                 document.getElementById('subTotalDisplay').innerText = subTotal;
                 
                 document.getElementById('itemName').value = "";
+                document.getElementById('itemDetail').value = "";
                 document.getElementById('itemQty').value = "";
                 document.getElementById('itemPrice').value = "";
 
@@ -292,7 +300,6 @@
                 `;
             });
 
-            // ٹوٹل سیل اور وصولی دکھانا
             document.getElementById('totalSalesDisplay').innerText = "Rs. " + totalSalesSum.toLocaleString();
             document.getElementById('totalPaidDisplay').innerText = "Rs. " + totalPaidSum.toLocaleString();
         }
@@ -314,6 +321,7 @@
             document.getElementById('paidAmountDisplay').innerText = "0";
             document.getElementById('grandTotal').innerText = "0";
             document.getElementById('custNameInput').value = "";
+            document.getElementById('itemDetail').value = "";
             document.getElementById('prevBalance').value = "";
             document.getElementById('paidAmount').value = "";
             document.getElementById('displayCustName').innerText = "-------";
