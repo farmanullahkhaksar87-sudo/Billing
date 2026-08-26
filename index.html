@@ -193,10 +193,69 @@
         </div>
     </div>
 
+    <!-- محفوظ شدہ بل دیکھنے کا پاپ اپ ماڈل -->
+    <div id="billDetailModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex justify-center items-center p-2 no-print">
+        <div class="bg-white rounded-lg shadow-2xl max-w-md w-full max-h-[95vh] overflow-y-auto p-4 text-right">
+            <!-- پاپ اپ ہیڈر -->
+            <div class="flex justify-between items-center border-b pb-2 mb-2">
+                <h3 class="font-bold text-lg text-blue-900">محفوظ شدہ بل کی رسید</h3>
+                <button onclick="closeBillModal()" class="text-red-600 font-bold text-2xl px-2">&times;</button>
+            </div>
+
+            <!-- پرچی کنٹینر (جس کا پرنٹ اور امیج بنے گی) -->
+            <div id="modalBillReceipt" class="bg-white p-3 border border-gray-300 rounded">
+                <h2 class="text-center font-bold text-xl">نیو قاری ہوزری سٹور</h2>
+                <p class="text-center text-[11px] text-gray-700 mt-0.5">نزد مبارک مسجد قائد اعظم مارکیٹ فیصل آباد</p>
+                <p class="text-center text-xs font-bold text-gray-800 mt-0.5" dir="ltr">📱 0306-5378112</p>
+
+                <div class="mt-2 border-t pt-1 flex justify-between text-xs font-bold">
+                    <div>کسٹمر: <span id="mCustName" class="text-blue-900"></span></div>
+                    <div>تاریخ: <span id="mBillDate" class="text-gray-700"></span></div>
+                </div>
+
+                <table class="w-full mt-2 border text-xs text-center">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border p-1">آئٹم / تفصیل</th>
+                            <th class="border p-1">تعداد</th>
+                            <th class="border p-1">قیمت</th>
+                            <th class="border p-1">کل</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mCartTable"></tbody>
+                </table>
+
+                <div class="mt-2 border-t pt-1 text-xs space-y-0.5">
+                    <div class="flex justify-between"><span>سب ٹوٹل (سیل):</span><span id="mSubTotal" class="font-bold">0</span></div>
+                    <div class="flex justify-between"><span>سابقہ بقایا:</span><span id="mPrevBalance">0</span></div>
+                    <div class="flex justify-between"><span>جمع شدہ رقم:</span><span id="mPaidAmount" class="text-green-700 font-bold">0</span></div>
+                    <div class="flex justify-between font-bold text-sm border-t pt-1 text-red-700">
+                        <span>ٹوٹل بقایا:</span><span id="mGrandTotal">0</span>
+                    </div>
+                </div>
+
+                <!-- بینک تفصیلات برائے ماڈل رسید -->
+                <div class="mt-2 border-t pt-1 bg-gray-50 p-1.5 rounded text-[10px] text-center space-y-1">
+                    <div><b>🏦 میزان بینک:</b> <span dir="ltr" class="font-mono font-bold">4301.0101787698</span> (Farmanullah)</div>
+                    <div><b>📲 جیز کیش:</b> <span dir="ltr" class="font-mono font-bold">0306-5378112</span> | <b>ایزی پیسہ:</b> <span dir="ltr" class="font-mono font-bold">0342-5405037</span></div>
+                </div>
+            </div>
+
+            <!-- پاپ اپ کنٹرول بٹنز -->
+            <div class="mt-3 grid grid-cols-3 gap-2">
+                <button onclick="printModalBill()" class="bg-green-600 text-white py-2 rounded text-xs font-bold">🖨️ پرنٹ کریں</button>
+                <button onclick="downloadModalBillImage()" class="bg-pink-600 text-white py-2 rounded text-xs font-bold">📲 واٹس ایپ تصویر</button>
+                <button onclick="loadBillToMainScreen()" class="bg-blue-600 text-white py-2 rounded text-xs font-bold">🔄 مین پر لوڈ کریں</button>
+            </div>
+            <button onclick="closeBillModal()" class="w-full bg-gray-600 text-white py-1.5 mt-2 rounded text-xs font-bold">بند کریں</button>
+        </div>
+    </div>
+
     <script>
         let subTotal = 0;
         let cartItems = [];
         let allBillsData = [];
+        let currentSelectedBill = null;
 
         window.onload = function() {
             document.getElementById('billDateDisplay').innerText = new Date().toLocaleDateString('en-GB');
@@ -332,14 +391,12 @@
                 return;
             }
 
-            bills.forEach((bill) => {
+            bills.forEach((bill, index) => {
                 const saleAmount = bill.subTotal || 0;
                 const paidAmt = bill.paidAmount || 0;
 
                 totalSalesSum += saleAmount;
                 totalPaidSum += paidAmt;
-
-                const itemsSummary = bill.items ? bill.items.map(i => `${i.item} (${i.qty} x ${i.price} = ${i.total})`).join('\n') : '';
                 
                 tbody.innerHTML += `
                     <tr class="border-b hover:bg-gray-50">
@@ -348,7 +405,7 @@
                         <td class="p-2 text-green-700 font-bold">${saleAmount}</td>
                         <td class="p-2 text-red-600 font-bold">${bill.grandTotal}</td>
                         <td class="p-2">
-                            <button onclick="alert('بل کی تفصیلات:\\n\\nکسٹمر: ${bill.customerName}\\nتاریخ: ${bill.date}\\n\\nآئٹمز:\\n${itemsSummary}\\n\\nسب ٹوٹل (سیل): ${bill.subTotal}\\nسابقہ بقایا: ${bill.prevBalance}\\nجمع شدہ: ${bill.paidAmount}\\nٹوٹل بقایا: ${bill.grandTotal}')" class="bg-blue-500 text-white px-2 py-1 rounded text-xs">تفصیل</button>
+                            <button onclick="viewBillDetails(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-bold shadow">تفصیل</button>
                         </td>
                     </tr>
                 `;
@@ -356,6 +413,110 @@
 
             document.getElementById('totalSalesDisplay').innerText = "Rs. " + totalSalesSum.toLocaleString();
             document.getElementById('totalPaidDisplay').innerText = "Rs. " + totalPaidSum.toLocaleString();
+        }
+
+        // محفوظ شدہ بل کو پاپ اپ میں دکھانے کا فنکشن
+        function viewBillDetails(index) {
+            const bill = allBillsData[index];
+            if(!bill) return;
+
+            currentSelectedBill = bill;
+
+            document.getElementById('mCustName').innerText = bill.customerName || '---';
+            document.getElementById('mBillDate').innerText = bill.date || '---';
+            document.getElementById('mSubTotal').innerText = bill.subTotal || 0;
+            document.getElementById('mPrevBalance').innerText = bill.prevBalance || 0;
+            document.getElementById('mPaidAmount').innerText = bill.paidAmount || 0;
+            document.getElementById('mGrandTotal').innerText = bill.grandTotal || 0;
+
+            const tbody = document.getElementById('mCartTable');
+            tbody.innerHTML = "";
+
+            if(bill.items && Array.isArray(bill.items)) {
+                bill.items.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr class="border-b">
+                            <td class="border p-1 text-right">${item.item}</td>
+                            <td class="border p-1">${item.qty}</td>
+                            <td class="border p-1">${item.price}</td>
+                            <td class="border p-1 font-bold">${item.total}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            document.getElementById('billDetailModal').classList.remove('hidden');
+        }
+
+        function closeBillModal() {
+            document.getElementById('billDetailModal').classList.add('hidden');
+        }
+
+        // پرانے بل کا انفرادی پرنٹ لینا
+        function printModalBill() {
+            const receiptHtml = document.getElementById('modalBillReceipt').innerHTML;
+            const printWin = window.open('', '', 'width=600,height=700');
+            printWin.document.write(`
+                <html dir="rtl" lang="ur">
+                <head>
+                    <title>بل رسید - نیو قاری ہوزری</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; direction: rtl; text-align: right; padding: 15px; margin: 0; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: center; }
+                        th, td { border: 1px solid #333; padding: 5px; }
+                        th { background: #eee; }
+                    </style>
+                </head>
+                <body>
+                    <div style="max-width: 380px; margin: auto; border: 1px solid #000; padding: 10px; border-radius: 6px;">
+                        ${receiptHtml}
+                    </div>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => {
+                printWin.print();
+                printWin.close();
+            }, 500);
+        }
+
+        // پرانے بل کی واٹس ایپ کے لیے تصویر ڈاؤن لوڈ کرنا
+        function downloadModalBillImage() {
+            const target = document.getElementById('modalBillReceipt');
+            html2canvas(target, { scale: 2 }).then(c => {
+                const link = document.createElement('a');
+                link.download = `Bill-${currentSelectedBill ? currentSelectedBill.customerName : 'Record'}.png`;
+                link.href = c.toDataURL("image/png");
+                link.click();
+            });
+        }
+
+        // پرانے بل کو مین بلنگ اسکرین پر لوڈ کرنا
+        function loadBillToMainScreen() {
+            if(!currentSelectedBill) return;
+            
+            document.getElementById('custNameInput').value = currentSelectedBill.customerName || "";
+            document.getElementById('displayCustName').innerText = currentSelectedBill.customerName || "-------";
+            document.getElementById('billDateDisplay').innerText = currentSelectedBill.date || "";
+            
+            subTotal = currentSelectedBill.subTotal || 0;
+            cartItems = currentSelectedBill.items ? [...currentSelectedBill.items] : [];
+            
+            const cartTable = document.getElementById('cartTable');
+            cartTable.innerHTML = "";
+            cartItems.forEach(i => {
+                cartTable.innerHTML += `<tr><td class="text-right px-1">${i.item}</td><td>${i.qty}</td><td>${i.price}</td><td>${i.total}</td></tr>`;
+            });
+            
+            document.getElementById('subTotalDisplay').innerText = subTotal;
+            document.getElementById('prevBalance').value = currentSelectedBill.prevBalance || 0;
+            document.getElementById('paidAmount').value = currentSelectedBill.paidAmount || 0;
+            
+            calculateTotal();
+            closeBillModal();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function filterBills() {
