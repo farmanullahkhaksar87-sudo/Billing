@@ -136,13 +136,21 @@
             
             <input type="text" id="custNameInput" placeholder="کسٹمر کا نام" onchange="fetchCustomerPreviousBalance()">
             
-            <!-- سٹاک سے منسلک ڈراپ ڈاؤن -->
-            <select id="itemName" onchange="onProductSelect()">
-                <option value="">پروڈکٹ منتخب کریں (لوڈ ہو رہا ہے...)</option>
-            </select>
+            <!-- سرچ ایبل پروڈکٹ ان پٹ اور لسٹ -->
+            <div class="relative">
+                <input type="text" id="prodSearchInput" placeholder="🔍 پروڈکٹ کا نام لکھ کر تلاش کریں..." oninput="filterProductDropdown()" onfocus="showProductDropdown()">
+                <input type="hidden" id="selectedProdKey" value="">
+                
+                <!-- سرچ رزلٹس ڈراپ ڈاؤن لسٹ -->
+                <div id="prodDropdownList" class="absolute z-50 w-full bg-white border-2 border-gray-400 max-h-48 overflow-y-auto rounded shadow-lg hidden">
+                    <!-- ڈائنامک آئٹمز یہاں آئیں گے -->
+                </div>
+            </div>
+
             <p id="stockNotice" class="text-xs text-blue-700 font-bold mt-1 px-1"></p>
 
-            <input type="text" id="itemDetail" placeholder="سب کیٹیگری / سائز / مزید تفصیل (مثلاً: کاٹن، لارج)">
+            <!-- نیا پروڈکٹ شامل کرنے کا ان پٹ (سب کیٹیگری کی جگہ) -->
+            <input type="text" id="customProdInput" placeholder="یا نیا پروڈکٹ نام درج کریں (اگر سٹاک میں نہ ہو)">
 
             <input type="number" id="itemQty" placeholder="تعداد / مقدار">
             <input type="number" id="itemPrice" placeholder="قیمتِ فروخت (اپنی مرضی کی درج کریں)">
@@ -299,6 +307,15 @@
                 loadStockFromFirebase();
                 loadBillsFromFirebase();
             }, 1000);
+
+            // سرچ ڈراپ ڈاؤن کے باہر کلک کرنے پر ڈراپ ڈاؤن بند کرنا
+            document.addEventListener('click', function(e) {
+                const searchBox = document.getElementById('prodSearchInput');
+                const dropList = document.getElementById('prodDropdownList');
+                if (searchBox && dropList && !searchBox.contains(e.target) && !dropList.contains(e.target)) {
+                    dropList.classList.add('hidden');
+                }
+            });
         };
 
         // ٹیبز بدلنے کا فنکشن (Tab Switching)
@@ -326,44 +343,56 @@
             const stockRef = window.ref(window.db, 'inventory');
             window.onValue(stockRef, (snapshot) => {
                 stockProducts = snapshot.val() || {};
-                renderStockDropdown();
                 renderStockTable();
+                filterProductDropdown();
             });
         }
 
-        // پروڈکٹ ڈراپ ڈاؤن لسٹ کو اپڈیٹ کرنا
-        function renderStockDropdown() {
-            const select = document.getElementById('itemName');
+        // سرچ ایبل ڈراپ ڈاؤن لسٹ کو رینڈر اور فلٹر کرنا
+        function filterProductDropdown() {
+            const query = document.getElementById('prodSearchInput').value.trim().toLowerCase();
+            const dropList = document.getElementById('prodDropdownList');
             const keys = Object.keys(stockProducts);
-            
+
             if (keys.length === 0) {
-                select.innerHTML = '<option value="">کوئی سٹاک پروڈکٹ موجود نہیں، سٹاک ٹیب میں شامل کریں</option>';
+                dropList.innerHTML = `<div class="p-2 text-xs text-gray-500 text-center">کوئی سٹاک پروڈکٹ موجود نہیں</div>`;
                 return;
             }
 
-            let optionsHtml = '<option value="">پروڈکٹ منتخب کریں (سٹاک لسٹ)</option>';
-            keys.forEach(key => {
+            const filteredKeys = keys.filter(key => {
                 const item = stockProducts[key];
-                optionsHtml += `<option value="${key}" data-stock="${item.stock || 0}" data-cost="${item.costPrice || 0}">
-                    ${item.name} (موجود سٹاک: ${item.stock || 0})
-                </option>`;
+                return item.name.toLowerCase().includes(query);
             });
-            select.innerHTML = optionsHtml;
+
+            if (filteredKeys.length === 0) {
+                dropList.innerHTML = `<div class="p-2 text-xs text-red-500 text-center">کوئی پروڈکٹ نہیں ملی</div>`;
+            } else {
+                let html = "";
+                filteredKeys.forEach(key => {
+                    const item = stockProducts[key];
+                    html += `
+                        <div onclick="selectProduct('${key}', '${item.name.replace(/'/g, "\\'")}', ${item.stock || 0})" 
+                             class="p-2 hover:bg-blue-50 cursor-pointer border-b text-sm flex justify-between items-center">
+                            <span class="font-bold text-gray-800">${item.name}</span>
+                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-semibold">سٹاک: ${item.stock || 0}</span>
+                        </div>
+                    `;
+                });
+                dropList.innerHTML = html;
+            }
         }
 
-        // پروڈکٹ سلیکٹ ہونے پر سٹاک کا نوٹس دکھانا
-        function onProductSelect() {
-            const select = document.getElementById('itemName');
-            const selectedOption = select.options[select.selectedIndex];
-            const stockNotice = document.getElementById('stockNotice');
+        function showProductDropdown() {
+            document.getElementById('prodDropdownList').classList.remove('hidden');
+            filterProductDropdown();
+        }
 
-            if (!select.value) {
-                stockNotice.innerText = "";
-                return;
-            }
-
-            const stock = parseFloat(selectedOption.getAttribute('data-stock')) || 0;
-            stockNotice.innerText = `موجود سٹاک: ${stock} عدد`;
+        function selectProduct(key, name, stock) {
+            document.getElementById('selectedProdKey').value = key;
+            document.getElementById('prodSearchInput').value = name;
+            document.getElementById('customProdInput').value = ""; // نیا پروڈکٹ فیلڈ خالی کریں
+            document.getElementById('stockNotice').innerText = `منتخب شدہ: ${name} | موجود سٹاک: ${stock} عدد`;
+            document.getElementById('prodDropdownList').classList.add('hidden');
         }
 
         // سٹاک ٹیبل کو رینڈر کرنا
@@ -441,22 +470,32 @@
         // آئٹم کارٹ میں شامل کرنا
         function addItem() {
             const name = document.getElementById('custNameInput').value.trim();
-            const select = document.getElementById('itemName');
-            const prodKey = select.value;
-            const detail = document.getElementById('itemDetail').value.trim();
+            const prodKey = document.getElementById('selectedProdKey').value;
+            const searchVal = document.getElementById('prodSearchInput').value.trim();
+            const customProd = document.getElementById('customProdInput').value.trim();
             const qty = parseFloat(document.getElementById('itemQty').value) || 0;
             const price = parseFloat(document.getElementById('itemPrice').value) || 0;
             
             if(name) document.getElementById('displayCustName').innerText = name;
             
-            if(!prodKey) {
-                alert("براہ کرم پروڈکٹ منتخب کریں۔");
+            // پروڈکٹ کا نام یا تو کسٹم فیلڈ سے آئے گا یا سرچ باکس سے
+            let finalItemName = "";
+            let finalProdKey = "";
+
+            if (customProd) {
+                finalItemName = customProd;
+                finalProdKey = ""; // نیا کسٹم پروڈکٹ سٹاک سے منسلک نہیں ہے
+            } else if (prodKey && searchVal) {
+                const itemObj = stockProducts[prodKey];
+                finalItemName = itemObj ? itemObj.name : searchVal;
+                finalProdKey = prodKey;
+            } else if (searchVal) {
+                finalItemName = searchVal;
+                finalProdKey = "";
+            } else {
+                alert("براہ کرم پروڈکٹ منتخب کریں یا نیا پروڈکٹ نام درج کریں۔");
                 return;
             }
-
-            const itemObj = stockProducts[prodKey];
-            const availableStock = itemObj ? (itemObj.stock || 0) : 0;
-            const itemName = itemObj ? itemObj.name : prodKey;
 
             if (qty <= 0) {
                 alert("براہ کرم درست تعداد درج کریں۔");
@@ -468,30 +507,34 @@
                 return;
             }
 
-            if (qty > availableStock) {
-                if(!confirm(`وارننگ: آپ کے پاس موجود سٹاک صرف (${availableStock}) ہے۔ کیا آپ پھر بھی یہ آئٹم شامل کرنا چاہتے ہیں؟`)) {
-                    return;
+            // اگر سٹاک سے منتخب ہو تو چیک کریں
+            if (finalProdKey && stockProducts[finalProdKey]) {
+                const availableStock = stockProducts[finalProdKey].stock || 0;
+                if (qty > availableStock) {
+                    if(!confirm(`وارننگ: آپ کے پاس موجود سٹاک صرف (${availableStock}) ہے۔ کیا آپ پھر بھی یہ آئٹم شامل کرنا چاہتے ہیں؟`)) {
+                        return;
+                    }
                 }
             }
 
             let total = qty * price;
             subTotal += total;
-            
-            let itemDisplayName = detail ? `${itemName} (${detail})` : itemName;
 
             cartItems.push({ 
-                prodKey: prodKey,
-                item: itemDisplayName, 
+                prodKey: finalProdKey,
+                item: finalItemName, 
                 qty: qty, 
                 price: price, 
                 total: total 
             });
 
-            document.getElementById('cartTable').innerHTML += `<tr><td class="text-right px-1">${itemDisplayName}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
+            document.getElementById('cartTable').innerHTML += `<tr><td class="text-right px-1">${finalItemName}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
             document.getElementById('subTotalDisplay').innerText = subTotal;
             
-            document.getElementById('itemName').value = "";
-            document.getElementById('itemDetail').value = "";
+            // ری سیٹ ان پٹس
+            document.getElementById('prodSearchInput').value = "";
+            document.getElementById('selectedProdKey').value = "";
+            document.getElementById('customProdInput').value = "";
             document.getElementById('itemQty').value = "";
             document.getElementById('itemPrice').value = "";
             document.getElementById('stockNotice').innerText = "";
@@ -544,7 +587,7 @@
                     updatedAt: now.toISOString()
                 });
 
-                // 3. سٹاک میں سے تعداد مائنس کریں
+                // 3. سٹاک میں سے تعداد مائنس کریں (صرف ان کی جو سٹاک لسٹ سے ہوں)
                 for(let cartItem of cartItems) {
                     if(cartItem.prodKey && stockProducts[cartItem.prodKey]) {
                         const currentStock = stockProducts[cartItem.prodKey].stock || 0;
@@ -753,8 +796,11 @@
             document.getElementById('paidAmountDisplay').innerText = "0";
             document.getElementById('grandTotal').innerText = "0";
             document.getElementById('custNameInput').value = "";
-            document.getElementById('itemDetail').value = "";
+            document.getElementById('prodSearchInput').value = "";
+            document.getElementById('selectedProdKey').value = "";
+            document.getElementById('customProdInput').value = "";
             document.getElementById('itemPrice').value = "";
+            document.getElementById('itemQty').value = "";
             document.getElementById('prevBalance').value = "";
             document.getElementById('paidAmount').value = "";
             document.getElementById('stockNotice').innerText = "";
