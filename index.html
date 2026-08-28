@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نیو قاری ہوزری سٹور</title>
+    <title>نیو قاری ہوزری سٹور - بلنگ اور سٹاک سسٹم</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <!-- Firebase SDK Modules -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, push, set, get, child, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, push, set, get, child, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDw27sGFr6hu8MFhKLhYbNz6UDr9drTwHY",
@@ -33,6 +33,8 @@
         window.child = child;
         window.ref = ref;
         window.onValue = onValue;
+        window.remove = remove;
+        window.update = update;
     </script>
 
     <style>
@@ -117,48 +119,67 @@
 
     <!-- انٹری کا حصہ (پرنٹ میں نہیں آئے گا) -->
     <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-4 no-print">
+        <h3 class="font-bold text-md text-gray-800 border-b pb-1 mb-2">بلنگ انٹری</h3>
+        
         <input type="text" id="custNameInput" placeholder="کسٹمر کا نام" onchange="fetchCustomerPreviousBalance()">
         
-        <select id="itemName">
-            <option value="">پروڈکٹ منتخب کریں</option>
-            <option value="مردانہ جراب">مردانہ جراب</option>
-            <option value="لیڈی جراب">لیڈی جراب</option>
-            <option value="بچہ جراب">بچہ جراب</option>
-            <option value="مردانہ جراب چائنا">مردانہ جراب چائنا</option>
-            <option value="لیڈی جراب چائنا">لیڈی جراب چائنا</option>
-            <option value="بچہ جراب چائنا">بچہ جراب چائنا</option>
-            <option value="موزہ">موزہ</option>
-            <option value="موزہ چائنا">موزہ چائنا</option>
-            <option value="ٹوپی">ٹوپی</option>
-            <option value="دستانہ">دستانہ</option>
-            <option value="ہائی نیک">ہائی نیک</option>
-            <option value="پاجامہ">پاجامہ</option>
-            <option value="کیپ">کیپ</option>
-            <option value="رومال">رومال</option>
-            <option value="ناڑہ">ناڑہ</option>
-            <option value="پرنہ">پرنہ</option>
-            <option value="بنیان">بنیان</option>
+        <!-- سٹاک سے منسلک ڈراپ ڈاؤن -->
+        <select id="itemName" onchange="onProductSelect()">
+            <option value="">پروڈکٹ منتخب کریں (لوڈ ہو رہا ہے...)</option>
         </select>
+        <p id="stockNotice" class="text-xs text-blue-700 font-bold mt-1 px-1"></p>
 
-        <input type="text" id="itemDetail" placeholder="سب کیٹیگری / سائز / مزید تفصیل (مثلاً: کاٹن، لارج، ڈبل)">
+        <input type="text" id="itemDetail" placeholder="سب کیٹیگری / سائز / مزید تفصیل (مثلاً: کاٹن، لارج)">
 
-        <input type="number" id="itemQty" placeholder="تعداد">
-        <input type="number" id="itemPrice" placeholder="قیمت">
-        <button onclick="addItem()" class="w-full bg-blue-600 text-white py-2 mt-3 font-bold">آئٹم شامل کریں</button>
+        <input type="number" id="itemQty" placeholder="تعداد / مقدار">
+        <input type="number" id="itemPrice" placeholder="قیمتِ فروخت (اپنی مرضی کی درج کریں)">
+        <button onclick="addItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 mt-3 font-bold rounded">آئٹم شامل کریں</button>
         
         <input type="number" id="prevBalance" placeholder="سابقہ بقایا" oninput="calculateTotal()">
         <input type="number" id="paidAmount" placeholder="جمع شدہ رقم" oninput="calculateTotal()">
         
-        <button onclick="saveBillToFirebase()" class="w-full bg-purple-600 text-white py-2 mt-3 font-bold">بل محفوظ کریں (Firebase)</button>
+        <button onclick="saveBillToFirebase()" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 mt-3 font-bold rounded">بل محفوظ کریں (Firebase)</button>
     </div>
 
-    <!-- پرنٹ اور واٹس ایپ بٹنز (پرنٹ میں نہیں آئیں گے) -->
+    <!-- پرنٹ اور واٹس ایپ بٹنز -->
     <div class="max-w-md mx-auto mt-4 grid grid-cols-2 gap-2 no-print">
-        <button onclick="window.print()" class="bg-green-600 text-white py-2 rounded font-bold">پرنٹ کریں</button>
-        <button onclick="downloadBillImage()" class="bg-pink-600 text-white py-2 rounded font-bold">واٹس ایپ تصویر</button>
+        <button onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded font-bold">پرنٹ کریں</button>
+        <button onclick="downloadBillImage()" class="bg-pink-600 hover:bg-pink-700 text-white py-2 rounded font-bold">واٹس ایپ تصویر</button>
     </div>
 
-    <!-- سابقہ بلوں کا ریکارڈ اور رپورٹ کا سیکشن (پرنٹ میں نہیں آئے گا) -->
+    <!-- سٹاک مینیجر سیکشن (پروڈکٹ نام، تعداد اور قیمت خرید) -->
+    <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-6 no-print border-t-4 border-indigo-600">
+        <h3 class="text-lg font-bold text-center border-b pb-2 mb-3 text-indigo-900">📦 سٹاک مینجمنٹ / انوینٹری</h3>
+        
+        <div class="space-y-2">
+            <input type="text" id="newProdName" placeholder="پروڈکٹ کا نام (مثلاً: مردانہ جراب، بنیان)">
+            <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="newProdStock" placeholder="کل سٹاک (تعداد)">
+                <input type="number" id="newProdCostPrice" placeholder="قیمتِ خرید (Cost Price)">
+            </div>
+            <button onclick="saveProductToStock()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded font-bold">نیا سٹاک شامل / اپڈیٹ کریں</button>
+        </div>
+
+        <!-- موجودہ سٹاک لسٹ -->
+        <h4 class="font-bold text-sm text-gray-700 mt-4 mb-1">موجودہ سٹاک لسٹ:</h4>
+        <div class="overflow-x-auto max-h-48 overflow-y-auto border rounded">
+            <table class="w-full text-xs text-center">
+                <thead>
+                    <tr class="bg-indigo-100 text-indigo-900 font-bold">
+                        <th class="p-1">پروڈکٹ</th>
+                        <th class="p-1">موجود سٹاک</th>
+                        <th class="p-1">قیمتِ خرید</th>
+                        <th class="p-1">ایکشن</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTableBody">
+                    <tr><td colspan="4" class="p-2 text-gray-500">سٹاک ڈیٹا لوڈ ہو رہا ہے...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- سابقہ بلوں کا ریکارڈ اور رپورٹ کا سیکشن -->
     <div class="max-w-md mx-auto bg-white p-4 rounded shadow mt-6 no-print">
         <h3 class="text-lg font-bold text-center border-b pb-2 mb-3">سابقہ بلوں کا ریکارڈ اور رپورٹ</h3>
 
@@ -196,13 +217,11 @@
     <!-- محفوظ شدہ بل دیکھنے کا پاپ اپ ماڈل -->
     <div id="billDetailModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex justify-center items-center p-2 no-print">
         <div class="bg-white rounded-lg shadow-2xl max-w-md w-full max-h-[95vh] overflow-y-auto p-4 text-right">
-            <!-- پاپ اپ ہیڈر -->
             <div class="flex justify-between items-center border-b pb-2 mb-2">
                 <h3 class="font-bold text-lg text-blue-900">محفوظ شدہ بل کی رسید</h3>
                 <button onclick="closeBillModal()" class="text-red-600 font-bold text-2xl px-2">&times;</button>
             </div>
 
-            <!-- پرچی کنٹینر (جس کا پرنٹ اور امیج بنے گی) -->
             <div id="modalBillReceipt" class="bg-white p-3 border border-gray-300 rounded">
                 <h2 class="text-center font-bold text-xl">نیو قاری ہوزری سٹور</h2>
                 <p class="text-center text-[11px] text-gray-700 mt-0.5">نزد مبارک مسجد قائد اعظم مارکیٹ فیصل آباد</p>
@@ -234,14 +253,12 @@
                     </div>
                 </div>
 
-                <!-- بینک تفصیلات برائے ماڈل رسید -->
                 <div class="mt-2 border-t pt-1 bg-gray-50 p-1.5 rounded text-[10px] text-center space-y-1">
                     <div><b>🏦 میزان بینک:</b> <span dir="ltr" class="font-mono font-bold">4301.0101787698</span> (Farmanullah)</div>
                     <div><b>📲 جیز کیش:</b> <span dir="ltr" class="font-mono font-bold">0306-5378112</span> | <b>ایزی پیسہ:</b> <span dir="ltr" class="font-mono font-bold">0342-5405037</span></div>
                 </div>
             </div>
 
-            <!-- پاپ اپ کنٹرول بٹنز -->
             <div class="mt-3 grid grid-cols-3 gap-2">
                 <button onclick="printModalBill()" class="bg-green-600 text-white py-2 rounded text-xs font-bold">🖨️ پرنٹ کریں</button>
                 <button onclick="downloadModalBillImage()" class="bg-pink-600 text-white py-2 rounded text-xs font-bold">📲 واٹس ایپ تصویر</button>
@@ -255,42 +272,192 @@
         let subTotal = 0;
         let cartItems = [];
         let allBillsData = [];
+        let stockProducts = {};
         let currentSelectedBill = null;
 
         window.onload = function() {
             document.getElementById('billDateDisplay').innerText = new Date().toLocaleDateString('en-GB');
-            setTimeout(loadBillsFromFirebase, 1000);
+            setTimeout(() => {
+                loadStockFromFirebase();
+                loadBillsFromFirebase();
+            }, 1000);
         };
 
+        // فائر بیس سے سٹاک لسٹ لوڈ اور سنکرونائز کرنا
+        function loadStockFromFirebase() {
+            const stockRef = window.ref(window.db, 'inventory');
+            window.onValue(stockRef, (snapshot) => {
+                stockProducts = snapshot.val() || {};
+                renderStockDropdown();
+                renderStockTable();
+            });
+        }
+
+        // پروڈکٹ ڈراپ ڈاؤن لسٹ کو اپڈیٹ کرنا
+        function renderStockDropdown() {
+            const select = document.getElementById('itemName');
+            const keys = Object.keys(stockProducts);
+            
+            if (keys.length === 0) {
+                select.innerHTML = '<option value="">کوئی سٹاک پروڈکٹ موجود نہیں، نیچے شامل کریں</option>';
+                return;
+            }
+
+            let optionsHtml = '<option value="">پروڈکٹ منتخب کریں (سٹاک لسٹ)</option>';
+            keys.forEach(key => {
+                const item = stockProducts[key];
+                optionsHtml += `<option value="${key}" data-stock="${item.stock || 0}" data-cost="${item.costPrice || 0}">
+                    ${item.name} (موجود سٹاک: ${item.stock || 0})
+                </option>`;
+            });
+            select.innerHTML = optionsHtml;
+        }
+
+        // پروڈکٹ سلیکٹ ہونے پر سٹاک کا نوٹس دکھانا
+        function onProductSelect() {
+            const select = document.getElementById('itemName');
+            const selectedOption = select.options[select.selectedIndex];
+            const stockNotice = document.getElementById('stockNotice');
+
+            if (!select.value) {
+                stockNotice.innerText = "";
+                return;
+            }
+
+            const stock = parseFloat(selectedOption.getAttribute('data-stock')) || 0;
+            stockNotice.innerText = `موجود سٹاک: ${stock} عدد`;
+        }
+
+        // سٹاک ٹیبل کو رینڈر کرنا
+        function renderStockTable() {
+            const tbody = document.getElementById('stockTableBody');
+            tbody.innerHTML = "";
+            const keys = Object.keys(stockProducts);
+
+            if(keys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-2 text-gray-500">کوئی پروڈکٹ ایڈ نہیں ہے</td></tr>`;
+                return;
+            }
+
+            keys.forEach(key => {
+                const item = stockProducts[key];
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-1.5 font-bold">${item.name}</td>
+                        <td class="p-1.5 text-blue-700 font-bold">${item.stock || 0}</td>
+                        <td class="p-1.5 text-gray-700 font-semibold">${item.costPrice ? 'Rs. ' + item.costPrice : '-'}</td>
+                        <td class="p-1.5 space-x-1">
+                            <button onclick="editStockItem('${key}')" class="bg-yellow-500 text-white px-1.5 py-0.5 rounded text-[10px]">ایڈٹ</button>
+                            <button onclick="deleteStockItem('${key}')" class="bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px]">حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // نیا پروڈکٹ سٹاک میں شامل کرنا یا اپڈیٹ کرنا (نام، سٹاک اور قیمتِ خرید)
+        async function saveProductToStock() {
+            const name = document.getElementById('newProdName').value.trim();
+            const stock = parseFloat(document.getElementById('newProdStock').value) || 0;
+            const costPrice = parseFloat(document.getElementById('newProdCostPrice').value) || 0;
+
+            if(!name) {
+                alert("براہ کرم پروڈکٹ کا نام درج کریں!");
+                return;
+            }
+
+            const prodId = name.replace(/[\/\.\#\$\[\]]/g, '_');
+
+            try {
+                await window.set(window.ref(window.db, 'inventory/' + prodId), {
+                    name: name,
+                    stock: stock,
+                    costPrice: costPrice,
+                    updatedAt: new Date().toISOString()
+                });
+
+                document.getElementById('newProdName').value = "";
+                document.getElementById('newProdStock').value = "";
+                document.getElementById('newProdCostPrice').value = "";
+                alert("سٹاک اور قیمتِ خرید کامیابی سے محفوظ ہو گئی!");
+            } catch(e) {
+                alert("سٹاک محفوظ کرنے میں مسئلہ: " + e.message);
+            }
+        }
+
+        function editStockItem(key) {
+            const item = stockProducts[key];
+            if(!item) return;
+            document.getElementById('newProdName').value = item.name;
+            document.getElementById('newProdStock').value = item.stock;
+            document.getElementById('newProdCostPrice').value = item.costPrice || "";
+        }
+
+        async function deleteStockItem(key) {
+            if(confirm("کیا آپ واقعی اس پروڈکٹ کو سٹاک لسٹ سے حذف کرنا چاہتے ہیں؟")) {
+                await window.remove(window.ref(window.db, 'inventory/' + key));
+            }
+        }
+
+        // آئٹم کارٹ میں شامل کرنا
         function addItem() {
             const name = document.getElementById('custNameInput').value.trim();
-            const item = document.getElementById('itemName').value;
+            const select = document.getElementById('itemName');
+            const prodKey = select.value;
             const detail = document.getElementById('itemDetail').value.trim();
             const qty = parseFloat(document.getElementById('itemQty').value) || 0;
             const price = parseFloat(document.getElementById('itemPrice').value) || 0;
             
             if(name) document.getElementById('displayCustName').innerText = name;
             
-            if(item && qty > 0 && price > 0) {
-                let total = qty * price;
-                subTotal += total;
-                
-                let itemDisplayName = detail ? `${item} (${detail})` : item;
-
-                cartItems.push({ item: itemDisplayName, qty, price, total });
-
-                document.getElementById('cartTable').innerHTML += `<tr><td class="text-right px-1">${itemDisplayName}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
-                document.getElementById('subTotalDisplay').innerText = subTotal;
-                
-                document.getElementById('itemName').value = "";
-                document.getElementById('itemDetail').value = "";
-                document.getElementById('itemQty').value = "";
-                document.getElementById('itemPrice').value = "";
-
-                calculateTotal();
-            } else {
-                alert("براہ کرم آئٹم، تعداد اور قیمت درست منتخب/درج کریں۔");
+            if(!prodKey) {
+                alert("براہ کرم پروڈکٹ منتخب کریں۔");
+                return;
             }
+
+            const itemObj = stockProducts[prodKey];
+            const availableStock = itemObj ? (itemObj.stock || 0) : 0;
+            const itemName = itemObj ? itemObj.name : prodKey;
+
+            if (qty <= 0) {
+                alert("براہ کرم درست تعداد درج کریں۔");
+                return;
+            }
+
+            if (price <= 0) {
+                alert("براہ کرم اپنی مرضی کی قیمتِ فروخت درج کریں۔");
+                return;
+            }
+
+            if (qty > availableStock) {
+                if(!confirm(`وارننگ: آپ کے پاس موجود سٹاک صرف (${availableStock}) ہے۔ کیا آپ پھر بھی یہ آئٹم شامل کرنا چاہتے ہیں؟`)) {
+                    return;
+                }
+            }
+
+            let total = qty * price;
+            subTotal += total;
+            
+            let itemDisplayName = detail ? `${itemName} (${detail})` : itemName;
+
+            cartItems.push({ 
+                prodKey: prodKey,
+                item: itemDisplayName, 
+                qty: qty, 
+                price: price, 
+                total: total 
+            });
+
+            document.getElementById('cartTable').innerHTML += `<tr><td class="text-right px-1">${itemDisplayName}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
+            document.getElementById('subTotalDisplay').innerText = subTotal;
+            
+            document.getElementById('itemName').value = "";
+            document.getElementById('itemDetail').value = "";
+            document.getElementById('itemQty').value = "";
+            document.getElementById('itemPrice').value = "";
+            document.getElementById('stockNotice').innerText = "";
+
+            calculateTotal();
         }
 
         function calculateTotal() {
@@ -301,6 +468,7 @@
             document.getElementById('grandTotal').innerText = (subTotal + prev) - paid;
         }
 
+        // بل محفوظ کرنا اور سٹاک سے تعداد خودکار مائنس کرنا
         async function saveBillToFirebase() {
             const customerName = document.getElementById('custNameInput').value.trim();
             if(!customerName || cartItems.length === 0) {
@@ -327,15 +495,28 @@
             };
 
             try {
+                // 1. بل محفوظ کریں
                 const newBillRef = window.push(window.ref(window.db, 'bills'));
                 await window.set(newBillRef, billData);
 
+                // 2. کسٹمر کا بقایا بیلنس اپڈیٹ کریں
                 await window.set(window.ref(window.db, 'customers/' + customerName), {
                     lastBalance: grandTotal,
                     updatedAt: now.toISOString()
                 });
 
-                alert("بل کامیابی سے فائر بیس پر محفوظ ہو گیا ہے!");
+                // 3. سٹاک میں سے تعداد مائنس کریں
+                for(let cartItem of cartItems) {
+                    if(cartItem.prodKey && stockProducts[cartItem.prodKey]) {
+                        const currentStock = stockProducts[cartItem.prodKey].stock || 0;
+                        const newStock = Math.max(0, currentStock - cartItem.qty);
+                        await window.update(window.ref(window.db, 'inventory/' + cartItem.prodKey), {
+                            stock: newStock
+                        });
+                    }
+                }
+
+                alert("بل کامیابی سے محفوظ ہو گیا اور سٹاک اپڈیٹ ہو گیا!");
                 resetForm();
             } catch (error) {
                 console.error("Firebase Error: ", error);
@@ -367,8 +548,7 @@
 
                 if (data) {
                     Object.keys(data).reverse().forEach(key => {
-                        const bill = data[key];
-                        allBillsData.push(bill);
+                        allBillsData.push(data[key]);
                     });
                     renderReportsTable(allBillsData);
                 } else {
@@ -415,7 +595,6 @@
             document.getElementById('totalPaidDisplay').innerText = "Rs. " + totalPaidSum.toLocaleString();
         }
 
-        // محفوظ شدہ بل کو پاپ اپ میں دکھانے کا فنکشن
         function viewBillDetails(index) {
             const bill = allBillsData[index];
             if(!bill) return;
@@ -452,7 +631,6 @@
             document.getElementById('billDetailModal').classList.add('hidden');
         }
 
-        // پرانے بل کا انفرادی پرنٹ لینا
         function printModalBill() {
             const receiptHtml = document.getElementById('modalBillReceipt').innerHTML;
             const printWin = window.open('', '', 'width=600,height=700');
@@ -482,7 +660,6 @@
             }, 500);
         }
 
-        // پرانے بل کی واٹس ایپ کے لیے تصویر ڈاؤن لوڈ کرنا
         function downloadModalBillImage() {
             const target = document.getElementById('modalBillReceipt');
             html2canvas(target, { scale: 2 }).then(c => {
@@ -493,7 +670,6 @@
             });
         }
 
-        // پرانے بل کو مین بلنگ اسکرین پر لوڈ کرنا
         function loadBillToMainScreen() {
             if(!currentSelectedBill) return;
             
@@ -537,8 +713,10 @@
             document.getElementById('grandTotal').innerText = "0";
             document.getElementById('custNameInput').value = "";
             document.getElementById('itemDetail').value = "";
+            document.getElementById('itemPrice').value = "";
             document.getElementById('prevBalance').value = "";
             document.getElementById('paidAmount').value = "";
+            document.getElementById('stockNotice').innerText = "";
             document.getElementById('displayCustName').innerText = "-------";
         }
 
