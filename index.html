@@ -149,8 +149,8 @@
 
             <p id="stockNotice" class="text-xs text-blue-700 font-bold mt-1 px-1"></p>
 
-            <!-- نیا پروڈکٹ شامل کرنے کا ان پٹ (سب کیٹیگری کی جگہ) -->
-            <input type="text" id="customProdInput" placeholder="یا نیا پروڈکٹ نام درج کریں (اگر سٹاک میں نہ ہو)">
+            <!-- نیا پروڈکٹ شامل کرنے کا ان پٹ -->
+            <input type="text" id="customProdInput" placeholder="یا نیا پروڈکٹ نام درج کریں (خود بخود سٹاک میں شامل ہوگا)">
 
             <input type="number" id="itemQty" placeholder="تعداد / مقدار">
             <input type="number" id="itemPrice" placeholder="قیمتِ فروخت (اپنی مرضی کی درج کریں)">
@@ -308,7 +308,7 @@
                 loadBillsFromFirebase();
             }, 1000);
 
-            // سرچ ڈراپ ڈاؤن کے باہر کلک کرنے پر ڈراپ ڈاؤن بند کرنا
+            // سرچ ڈراپ ڈاؤن کے باہر کلک کرنے پر بند ہونا
             document.addEventListener('click', function(e) {
                 const searchBox = document.getElementById('prodSearchInput');
                 const dropList = document.getElementById('prodDropdownList');
@@ -318,7 +318,7 @@
             });
         };
 
-        // ٹیبز بدلنے کا فنکشن (Tab Switching)
+        // ٹیبز سوئچ کرنا
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
 
@@ -338,7 +338,7 @@
             }
         }
 
-        // فائر بیس سے سٹاک لسٹ لوڈ اور سنکرونائز کرنا
+        // فائر بیس سے انوینٹری لوڈ کرنا
         function loadStockFromFirebase() {
             const stockRef = window.ref(window.db, 'inventory');
             window.onValue(stockRef, (snapshot) => {
@@ -348,20 +348,20 @@
             });
         }
 
-        // سرچ ایبل ڈراپ ڈاؤن لسٹ کو رینڈر اور فلٹر کرنا
+        // سرچ ڈراپ ڈاؤن فلٹر کرنا
         function filterProductDropdown() {
             const query = document.getElementById('prodSearchInput').value.trim().toLowerCase();
             const dropList = document.getElementById('prodDropdownList');
             const keys = Object.keys(stockProducts);
 
             if (keys.length === 0) {
-                dropList.innerHTML = `<div class="p-2 text-xs text-gray-500 text-center">کوئی سٹاک پروڈکٹ موجود نہیں</div>`;
+                dropList.innerHTML = `<div class="p-2 text-xs text-gray-500 text-center">کوئی پروڈکٹ محفوظ نہیں</div>`;
                 return;
             }
 
             const filteredKeys = keys.filter(key => {
                 const item = stockProducts[key];
-                return item.name.toLowerCase().includes(query);
+                return item && item.name && item.name.toLowerCase().includes(query);
             });
 
             if (filteredKeys.length === 0) {
@@ -390,12 +390,12 @@
         function selectProduct(key, name, stock) {
             document.getElementById('selectedProdKey').value = key;
             document.getElementById('prodSearchInput').value = name;
-            document.getElementById('customProdInput').value = ""; // نیا پروڈکٹ فیلڈ خالی کریں
+            document.getElementById('customProdInput').value = "";
             document.getElementById('stockNotice').innerText = `منتخب شدہ: ${name} | موجود سٹاک: ${stock} عدد`;
             document.getElementById('prodDropdownList').classList.add('hidden');
         }
 
-        // سٹاک ٹیبل کو رینڈر کرنا
+        // سٹاک ٹیبل رینڈر کرنا
         function renderStockTable() {
             const tbody = document.getElementById('stockTableBody');
             tbody.innerHTML = "";
@@ -422,7 +422,7 @@
             });
         }
 
-        // نیا پروڈکٹ سٹاک میں شامل کرنا یا اپڈیٹ کرنا
+        // سٹاک ٹیب سے نیا پروڈکٹ سیو کرنا
         async function saveProductToStock() {
             const name = document.getElementById('newProdName').value.trim();
             const stock = parseFloat(document.getElementById('newProdStock').value) || 0;
@@ -446,7 +446,7 @@
                 document.getElementById('newProdName').value = "";
                 document.getElementById('newProdStock').value = "";
                 document.getElementById('newProdCostPrice').value = "";
-                alert("سٹاک اور قیمتِ خرید کامیابی سے محفوظ ہو گئی!");
+                alert("سٹاک کامیابی سے محفوظ ہو گیا!");
             } catch(e) {
                 alert("سٹاک محفوظ کرنے میں مسئلہ: " + e.message);
             }
@@ -467,8 +467,8 @@
             }
         }
 
-        // آئٹم کارٹ میں شامل کرنا
-        function addItem() {
+        // آئٹم کارٹ میں شامل کرنا اور نیا پروڈکٹ خود بخود سٹاک میں شامل کرنا
+        async function addItem() {
             const name = document.getElementById('custNameInput').value.trim();
             const prodKey = document.getElementById('selectedProdKey').value;
             const searchVal = document.getElementById('prodSearchInput').value.trim();
@@ -478,20 +478,47 @@
             
             if(name) document.getElementById('displayCustName').innerText = name;
             
-            // پروڈکٹ کا نام یا تو کسٹم فیلڈ سے آئے گا یا سرچ باکس سے
             let finalItemName = "";
             let finalProdKey = "";
 
+            // اگر نیا نام لکھا ہو تو وہ شامل ہوگا
             if (customProd) {
                 finalItemName = customProd;
-                finalProdKey = ""; // نیا کسٹم پروڈکٹ سٹاک سے منسلک نہیں ہے
+                finalProdKey = customProd.replace(/[\/\.\#\$\[\]]/g, '_');
+
+                // اگر یہ پروڈکٹ سٹاک میں پہلے سے موجود نہ ہو تو بغیر تعداد اور قیمت کے خود بخود فائر بیس میں شامل کریں
+                if (!stockProducts[finalProdKey]) {
+                    try {
+                        await window.set(window.ref(window.db, 'inventory/' + finalProdKey), {
+                            name: finalItemName,
+                            stock: 0,
+                            costPrice: 0,
+                            updatedAt: new Date().toISOString()
+                        });
+                    } catch(err) {
+                        console.error("آٹو سٹاک سیو میں مسئلہ:", err);
+                    }
+                }
             } else if (prodKey && searchVal) {
                 const itemObj = stockProducts[prodKey];
                 finalItemName = itemObj ? itemObj.name : searchVal;
                 finalProdKey = prodKey;
             } else if (searchVal) {
                 finalItemName = searchVal;
-                finalProdKey = "";
+                finalProdKey = searchVal.replace(/[\/\.\#\$\[\]]/g, '_');
+
+                if (!stockProducts[finalProdKey]) {
+                    try {
+                        await window.set(window.ref(window.db, 'inventory/' + finalProdKey), {
+                            name: finalItemName,
+                            stock: 0,
+                            costPrice: 0,
+                            updatedAt: new Date().toISOString()
+                        });
+                    } catch(err) {
+                        console.error("آٹو سٹاک سیو میں مسئلہ:", err);
+                    }
+                }
             } else {
                 alert("براہ کرم پروڈکٹ منتخب کریں یا نیا پروڈکٹ نام درج کریں۔");
                 return;
@@ -507,10 +534,10 @@
                 return;
             }
 
-            // اگر سٹاک سے منتخب ہو تو چیک کریں
+            // اگر سٹاک موجود ہو اور اس سے زیادہ تعداد لکھی جائے تو وارننگ دیں
             if (finalProdKey && stockProducts[finalProdKey]) {
                 const availableStock = stockProducts[finalProdKey].stock || 0;
-                if (qty > availableStock) {
+                if (availableStock > 0 && qty > availableStock) {
                     if(!confirm(`وارننگ: آپ کے پاس موجود سٹاک صرف (${availableStock}) ہے۔ کیا آپ پھر بھی یہ آئٹم شامل کرنا چاہتے ہیں؟`)) {
                         return;
                     }
@@ -531,7 +558,7 @@
             document.getElementById('cartTable').innerHTML += `<tr><td class="text-right px-1">${finalItemName}</td><td>${qty}</td><td>${price}</td><td>${total}</td></tr>`;
             document.getElementById('subTotalDisplay').innerText = subTotal;
             
-            // ری سیٹ ان پٹس
+            // ان پٹ ری سیٹ کریں
             document.getElementById('prodSearchInput').value = "";
             document.getElementById('selectedProdKey').value = "";
             document.getElementById('customProdInput').value = "";
@@ -550,7 +577,7 @@
             document.getElementById('grandTotal').innerText = (subTotal + prev) - paid;
         }
 
-        // بل محفوظ کرنا اور سٹاک سے تعداد خودکار مائنس کرنا
+        // بل فائر بیس پر محفوظ کرنا
         async function saveBillToFirebase() {
             const customerName = document.getElementById('custNameInput').value.trim();
             if(!customerName || cartItems.length === 0) {
@@ -577,17 +604,17 @@
             };
 
             try {
-                // 1. بل محفوظ کریں
+                // 1. نیا بل سیو کریں
                 const newBillRef = window.push(window.ref(window.db, 'bills'));
                 await window.set(newBillRef, billData);
 
-                // 2. کسٹمر کا بقایا بیلنس اپڈیٹ کریں
+                // 2. کسٹمر بیلنس اپڈیٹ کریں
                 await window.set(window.ref(window.db, 'customers/' + customerName), {
                     lastBalance: grandTotal,
                     updatedAt: now.toISOString()
                 });
 
-                // 3. سٹاک میں سے تعداد مائنس کریں (صرف ان کی جو سٹاک لسٹ سے ہوں)
+                // 3. اگر سٹاک سے تعداد کم کرنی ہو
                 for(let cartItem of cartItems) {
                     if(cartItem.prodKey && stockProducts[cartItem.prodKey]) {
                         const currentStock = stockProducts[cartItem.prodKey].stock || 0;
@@ -598,7 +625,7 @@
                     }
                 }
 
-                alert("بل کامیابی سے محفوظ ہو گیا اور سٹاک اپڈیٹ ہو گیا!");
+                alert("بل کامیابی سے محفوظ ہو گیا!");
                 resetForm();
             } catch (error) {
                 console.error("Firebase Error: ", error);
